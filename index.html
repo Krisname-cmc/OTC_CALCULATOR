@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OTC Калькулятор Угод</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #0f131a;
+    color: #e0e3eb;
+    display: flex;
+    justify-content: center;
+    padding: 12px;
+    user-select: none;
+  }
+  .widget {
+    width: 100%;
+    max-width: 310px;
+    background: #181c27;
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid #2a2f3d;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+  .header {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #848e9c;
+    letter-spacing: 0.8px;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+  /* ГОЛОВНИЙ БЛОК З ВІДСОТКОМ ТОРГІВЛІ ТА БАЛАНСОМ */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .metric-box {
+    background: #10141d;
+    border: 1px solid #252a37;
+    border-radius: 12px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .metric-label {
+    font-size: 11px;
+    color: #848e9c;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .winrate-val {
+    font-size: 26px;
+    font-weight: 800;
+    color: #e0e3eb;
+  }
+  .balance-val {
+    font-size: 20px;
+    font-weight: 800;
+    color: #3b82f6;
+    margin-top: 3px;
+  }
+  .pnl-sub {
+    font-size: 11px;
+    margin-top: 4px;
+    font-weight: 600;
+  }
+  /* НАЛАШТУВАННЯ РАХУНКУ */
+  .settings {
+    background: #10141d;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 14px;
+    border: 1px solid #252a37;
+  }
+  .setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: #b7bdc6;
+  }
+  .setting-row:last-child {
+    margin-bottom: 0;
+  }
+  .setting-row input {
+    width: 72px;
+    background: #1e2330;
+    border: 1px solid #323949;
+    color: #ffffff;
+    padding: 4px 6px;
+    border-radius: 6px;
+    text-align: right;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  /* ВЕЛИКІ КНОПКИ + ТА - */
+  .action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .btn {
+    border: none;
+    border-radius: 12px;
+    padding: 16px 0;
+    font-size: 24px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.08s ease, filter 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn span {
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 2px;
+    letter-spacing: 0.5px;
+  }
+  .btn:active {
+    transform: scale(0.95);
+  }
+  .btn-plus {
+    background: linear-gradient(135deg, #0ecb81, #059669);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(14, 203, 129, 0.25);
+  }
+  .btn-minus {
+    background: linear-gradient(135deg, #f6465d, #dc2626);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(246, 70, 93, 0.25);
+  }
+  /* ЛІЧИЛЬНИК УГОД */
+  .counters {
+    display: flex;
+    justify-content: space-around;
+    background: #10141d;
+    padding: 8px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    border: 1px solid #252a37;
+  }
+  .counter-item b {
+    font-size: 14px;
+    margin-left: 4px;
+  }
+  .green { color: #0ecb81; }
+  .red { color: #f6465d; }
+  /* СТРІЧКА ОСТАННІХ УГОД */
+  .dots-bar {
+    text-align: center;
+    font-size: 13px;
+    letter-spacing: 2px;
+    min-height: 20px;
+    margin-bottom: 12px;
+    word-break: break-all;
+  }
+  /* НИЖНІ КНОПКИ КЕРУВАННЯ */
+  .footer-btns {
+    display: flex;
+    gap: 8px;
+  }
+  .btn-util {
+    flex: 1;
+    background: #232836;
+    color: #9aa3b2;
+    border: 1px solid #2f3646;
+    padding: 7px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-util:hover {
+    color: #ffffff;
+    background: #2b3142;
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="header">⚡ OTC Трекер &amp; Вінрейт</div>
+
+  <div class="metrics-grid">
+    <div class="metric-box">
+      <div class="metric-label">Відсоток угод</div>
+      <div class="winrate-val" id="winRate">0.0%</div>
+      <div class="pnl-sub" id="goalText" style="color: #848e9c;">Ціль: 55%+</div>
+    </div>
+    <div class="metric-box">
+      <div class="metric-label">Мій рахунок</div>
+      <div class="balance-val" id="currentBal">$100.00</div>
+      <div class="pnl-sub" id="pnlText">+$0.00 (0%)</div>
+    </div>
+  </div>
+
+  <div class="settings">
+    <div class="setting-row">
+      <span>Початковий депозит ($):</span>
+      <input type="number" id="startBal" value="100" step="1" onchange="updateDeposit()">
+    </div>
+    <div class="setting-row">
+      <span>Сума угоди ($):</span>
+      <input type="number" id="betSize" value="2" step="0.5" onchange="saveSettings()">
+    </div>
+    <div class="setting-row">
+      <span>Виплата брокера (%):</span>
+      <input type="number" id="payout" value="85" step="1" onchange="saveSettings()">
+    </div>
+  </div>
+
+  <div class="action-buttons">
+    <button class="btn btn-plus" onclick="recordTrade(true)">+<span>ПЛЮС</span></button>
+    <button class="btn btn-minus" onclick="recordTrade(false)">−<span>МІНУС</span></button>
+  </div>
+
+  <div class="counters">
+    <div class="counter-item">Угод: <b id="totalCount">0</b></div>
+    <div class="counter-item green">Плюс: <b id="winCount">0</b></div>
+    <div class="counter-item red">Мінус: <b id="lossCount">0</b></div>
+  </div>
+
+  <div class="dots-bar" id="dotsBar"></div>
+
+  <div class="footer-btns">
+    <button class="btn-util" onclick="undoTrade()">↩ Скасувати останню</button>
+    <button class="btn-util" onclick="resetTracker()">🗑 Нова сесія</button>
+  </div>
+</div>
+
+<script>
+  let data = JSON.parse(localStorage.getItem('super_ai_otc_calc')) || {
+    startBal: 100,
+    betSize: 2,
+    payout: 85,
+    trades: []
+  };
+
+  document.getElementById('startBal').value = data.startBal;
+  document.getElementById('betSize').value = data.betSize;
+  document.getElementById('payout').value = data.payout;
+
+  function saveAndRender() {
+    localStorage.setItem('super_ai_otc_calc', JSON.stringify(data));
+    renderUI();
+  }
+
+  function saveSettings() {
+    data.betSize = parseFloat(document.getElementById('betSize').value) || 1;
+    data.payout = parseFloat(document.getElementById('payout').value) || 82;
+    saveAndRender();
+  }
+
+  function updateDeposit() {
+    data.startBal = parseFloat(document.getElementById('startBal').value) || 100;
+    saveAndRender();
+  }
+
+  function recordTrade(isWin) {
+    saveSettings();
+    const profit = isWin ? (data.betSize * (data.payout / 100)) : -data.betSize;
+    data.trades.push({ win: isWin, profit: profit });
+    saveAndRender();
+  }
+
+  function undoTrade() {
+    if (data.trades.length > 0) {
+      data.trades.pop();
+      saveAndRender();
+    }
+  }
+
+  function resetTracker() {
+    if (!confirm("Очистити історію угод і почати нову сесію з поточного стартового депозиту?")) return;
+    data.startBal = parseFloat(document.getElementById('startBal').value) || 100;
+    data.trades = [];
+    saveAndRender();
+  }
+
+  function renderUI() {
+    const total = data.trades.length;
+    const wins = data.trades.filter(t => t.win).length;
+    const losses = total - wins;
+    const winRate = total > 0 ? ((wins / total) * 100) : 0;
+
+    const netProfit = data.trades.reduce((sum, t) => sum + t.profit, 0);
+    const balance = data.startBal + netProfit;
+    const roi = data.startBal > 0 ? ((netProfit / data.startBal) * 100) : 0;
+
+    // Відсоток торгівлі (Вінрейт)
+    const wrEl = document.getElementById('winRate');
+    wrEl.textContent = `${winRate.toFixed(1)}%`;
+    if (total === 0) {
+      wrEl.style.color = '#e0e3eb';
+    } else if (winRate >= 55) {
+      wrEl.style.color = '#0ecb81';
+    } else {
+      wrEl.style.color = '#f6465d';
+    }
+
+    // Баланс та прибуток
+    document.getElementById('currentBal').textContent = `$${balance.toFixed(2)}`;
+    const pnlEl = document.getElementById('pnlText');
+    const sign = netProfit >= 0 ? '+' : '';
+    pnlEl.textContent = `${sign}$${netProfit.toFixed(2)} (${sign}${roi.toFixed(1)}%)`;
+    pnlEl.style.color = netProfit >= 0 ? '#0ecb81' : '#f6465d';
+
+    // Лічильники
+    document.getElementById('totalCount').textContent = total;
+    document.getElementById('winCount').textContent = wins;
+    document.getElementById('lossCount').textContent = losses;
+
+    // Останні 18 угод у вигляді індикаторів
+    document.getElementById('dotsBar').textContent = data.trades
+      .slice(-18)
+      .map(t => t.win ? '🟢' : '🔴')
+      .join('');
+  }
+
+  renderUI();
+</script>
+</body>
+</html>
