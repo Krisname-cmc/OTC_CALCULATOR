@@ -165,9 +165,9 @@
 <body>
 
 <div class="card" id="trackerCard">
-  <button class="btn-pip" id="pipBtn" onclick="openFloatingWidget()">📌 Закріпити поверх екрана</button>
+  <button class="btn-pip" id="pipBtn">📌 Закріпити поверх екрана</button>
 
-  <select id="pairSelect" class="pair-select" onchange="changePair()">
+  <select id="pairSelect" class="pair-select">
     <option value="EURUSD_otc">💎 EURUSD_otc</option>
     <option value="GBPUSD_otc">💎 GBPUSD_otc</option>
     <option value="USDJPY_otc">💎 USDJPY_otc</option>
@@ -192,15 +192,15 @@
   </div>
 
   <div class="buttons">
-    <button class="btn btn-plus" onclick="addResult(true)">+</button>
-    <button class="btn btn-minus" onclick="addResult(false)">−</button>
+    <button class="btn btn-plus" id="btnPlus">+</button>
+    <button class="btn btn-minus" id="btnMinus">−</button>
   </div>
 
   <div class="dots" id="dots"></div>
 
   <div class="footer">
-    <button class="btn-small" onclick="undoLast()">↩ Назад</button>
-    <button class="btn-small" onclick="resetSession()">🗑 Скинути</button>
+    <button class="btn-small" id="btnUndo">↩ Назад</button>
+    <button class="btn-small" id="btnReset">🗑 Скинути</button>
   </div>
 </div>
 
@@ -216,34 +216,40 @@
     return activeDoc.getElementById(id) || document.getElementById(id);
   }
 
-  document.getElementById('pairSelect').value = state.pair;
-
   function save() {
     localStorage.setItem('otc_simple_tracker', JSON.stringify(state));
     render();
   }
 
-  function changePair() {
-    state.pair = getEl('pairSelect').value;
+  // Надійна прив'язка кнопок через addEventListener (працює в обох вікнах!)
+  document.getElementById('pairSelect').addEventListener('change', (e) => {
+    state.pair = e.target.value;
     save();
-  }
+  });
 
-  function addResult(isWin) {
-    state.results.push(isWin);
+  document.getElementById('btnPlus').addEventListener('click', () => {
+    state.results.push(true);
     save();
-  }
+  });
 
-  function undoLast() {
+  document.getElementById('btnMinus').addEventListener('click', () => {
+    state.results.push(false);
+    save();
+  });
+
+  document.getElementById('btnUndo').addEventListener('click', () => {
     if (state.results.length > 0) {
       state.results.pop();
       save();
     }
-  }
+  });
 
-  function resetSession() {
+  document.getElementById('btnReset').addEventListener('click', () => {
     state.results = [];
     save();
-  }
+  });
+
+  document.getElementById('pipBtn').addEventListener('click', openFloatingWidget);
 
   function render() {
     const total = state.results.length;
@@ -301,7 +307,6 @@
         alert("Не вдалося відкрити плаваюче вікно. Просто перетягніть вкладку у нове вузьке вікно.");
       }
     } else {
-      // Резервний варіант для браузерів без Picture-in-Picture (відкриває вузьке спливаюче вікно)
       window.open(window.location.href, 'OTCTracker', 'width=290,height=410,resizable=yes');
     }
   }
