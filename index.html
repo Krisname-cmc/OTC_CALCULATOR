@@ -3,16 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OTC Вінрейт Трекер</title>
-<style id="mainStyles">
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+<title>SUPER AI OTC — Автономний Термінал</title>
+<style id="appStyles">
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: #0f131a;
+    background-color: #0b0e14;
     color: #e0e3eb;
     display: flex;
     justify-content: center;
@@ -21,151 +17,168 @@
     padding: 8px;
     user-select: none;
   }
-  .card {
+  .app-card {
     width: 100%;
-    max-width: 265px;
-    background: #181c27;
+    max-width: 280px;
+    background: #151924;
     border-radius: 16px;
-    padding: 14px;
-    border: 1px solid #2a2f3d;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    text-align: center;
+    padding: 12px;
+    border: 1px solid #262c3a;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  }
+  .top-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
   }
   .btn-pip {
-    width: 100%;
+    flex: 1;
     background: #2962ff;
-    color: #ffffff;
+    color: #fff;
     border: none;
     border-radius: 8px;
-    padding: 7px 10px;
-    font-size: 12px;
+    padding: 6px;
+    font-size: 11px;
     font-weight: 700;
     cursor: pointer;
-    margin-bottom: 10px;
-    transition: background 0.15s;
   }
-  .btn-pip:hover {
-    background: #1e53e5;
+  .btn-sound {
+    background: #222736;
+    color: #e0e3eb;
+    border: 1px solid #323949;
+    border-radius: 8px;
+    padding: 6px 9px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .api-bar {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .api-bar input {
+    flex: 1;
+    background: #0e1118;
+    border: 1px solid #2b3142;
+    color: #9aa3b2;
+    border-radius: 6px;
+    padding: 4px 6px;
+    font-size: 10px;
   }
   .pair-select {
     width: 100%;
-    background: #10141d;
+    background: #0e1118;
     color: #ffffff;
     border: 1px solid #323949;
     border-radius: 10px;
     padding: 7px 8px;
     font-size: 13px;
     font-weight: 700;
-    text-align: center;
-    margin-bottom: 10px;
-    cursor: pointer;
+    margin-bottom: 8px;
     outline: none;
+    cursor: pointer;
   }
-  .winrate-box {
-    background: #10141d;
-    border: 1px solid #252a37;
+  /* БЛОК ЖИВОГО РАДАРА СИГНАЛІВ */
+  .radar-box {
+    background: #0e1118;
+    border: 2px solid #252b3b;
     border-radius: 12px;
     padding: 10px 8px;
+    text-align: center;
     margin-bottom: 10px;
+    transition: all 0.2s ease;
   }
-  .winrate-label {
-    font-size: 10px;
-    color: #848e9c;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    margin-bottom: 2px;
+  .radar-box.call {
+    border-color: #00e676;
+    background: rgba(0, 200, 83, 0.14);
   }
-  .winrate-value {
-    font-size: 32px;
-    font-weight: 800;
-    color: #e0e3eb;
-    line-height: 1.1;
+  .radar-box.put {
+    border-color: #ff1744;
+    background: rgba(213, 0, 0, 0.14);
   }
-  .counters {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
-    background: #10141d;
-    border: 1px solid #252a37;
+  .signal-title {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .signal-sub {
+    font-size: 11px;
+    color: #9aa3b2;
+  }
+  /* БЛОК КАЛЬКУЛЯТОРА ВІНРЕЙТУ */
+  .divider {
+    height: 1px;
+    background: #252b3b;
+    margin: 8px 0;
+  }
+  .stats-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0e1118;
     border-radius: 10px;
-    padding: 6px 4px;
-    margin-bottom: 10px;
-    font-size: 10px;
-    color: #848e9c;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    border: 1px solid #222736;
   }
-  .counters div b {
-    display: block;
-    font-size: 15px;
-    margin-top: 2px;
+  .winrate-big {
+    font-size: 24px;
+    font-weight: 800;
   }
-  .plus-text { color: #00e676; }
-  .minus-text { color: #ff1744; }
-  .total-text { color: #ffffff; }
-  .buttons {
+  .mini-counts {
+    text-align: right;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .plus-c { color: #00e676; font-weight: 700; }
+  .minus-c { color: #ff1744; font-weight: 700; }
+  .trade-btns {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 8px;
+    margin-bottom: 8px;
   }
-  .btn {
+  .t-btn {
     border: none;
-    border-radius: 12px;
-    padding: 12px 0;
-    font-size: 28px;
+    border-radius: 10px;
+    padding: 10px 0;
+    font-size: 24px;
     font-weight: 900;
+    color: #fff;
     cursor: pointer;
-    transition: transform 0.08s ease, filter 0.15s ease;
   }
-  .btn:hover {
-    filter: brightness(1.1);
-  }
-  .btn:active {
-    transform: scale(0.94);
-  }
-  .btn-plus {
-    background-color: #00c853;
-    color: #ffffff;
-    border: 2px solid #00e676;
-    box-shadow: 0 4px 12px rgba(0, 200, 83, 0.35);
-  }
-  .btn-minus {
-    background-color: #d50000;
-    color: #ffffff;
-    border: 2px solid #ff1744;
-    box-shadow: 0 4px 12px rgba(213, 0, 0, 0.35);
-  }
-  .dots {
-    font-size: 11px;
-    letter-spacing: 2px;
-    min-height: 16px;
-    margin-bottom: 10px;
-    word-break: break-all;
-  }
+  .t-btn:active { transform: scale(0.95); }
+  .t-plus { background: #00c853; border: 2px solid #00e676; }
+  .t-minus { background: #d50000; border: 2px solid #ff1744; }
   .footer {
     display: flex;
-    gap: 8px;
+    gap: 6px;
   }
-  .btn-small {
+  .f-btn {
     flex: 1;
-    background: #232836;
-    color: #9aa3b2;
-    border: 1px solid #2f3646;
-    border-radius: 8px;
-    padding: 5px;
-    font-size: 11px;
-    font-weight: 600;
+    background: #202534;
+    color: #848e9c;
+    border: 1px solid #2c3345;
+    border-radius: 6px;
+    padding: 4px;
+    font-size: 10px;
     cursor: pointer;
   }
-  .btn-small:hover {
-    color: #ffffff;
-    background: #2b3142;
-  }
+  .f-btn:hover { color: #fff; }
 </style>
 </head>
 <body>
 
-<div class="card" id="trackerCard">
-  <button class="btn-pip" id="pipBtn">📌 Закріпити поверх екрана</button>
+<div class="app-card" id="mainWidget">
+  <div class="top-bar">
+    <button class="btn-pip" id="pipBtn">📌 Поверх вікон</button>
+    <button class="btn-sound" id="soundBtn" title="Звуковий сигнал">🔊</button>
+  </div>
+
+  <div class="api-bar" id="apiBar">
+    <input type="text" id="apiUrlInput" placeholder="https://railway.app">
+  </div>
 
   <select id="pairSelect" class="pair-select">
     <option value="EURUSD_otc">💎 EURUSD_otc</option>
@@ -180,78 +193,113 @@
     <option value="EURGBP_otc">💎 EURGBP_otc</option>
   </select>
 
-  <div class="winrate-box">
-    <div class="winrate-label">Прибуткових угод</div>
-    <div class="winrate-value" id="winRate">0.0%</div>
+  <div class="radar-box" id="radarBox">
+    <div class="signal-title" id="signalTitle">⏳ ОЧІКУВАННЯ</div>
+    <div class="signal-sub" id="signalSub">Вставте URL сервера Railway зверху</div>
   </div>
 
-  <div class="counters">
-    <div>Плюс (+)<b class="plus-text" id="plusCount">0</b></div>
-    <div>Мінус (−)<b class="minus-text" id="minusCount">0</b></div>
-    <div>Усього<b class="total-text" id="totalCount">0</b></div>
+  <div class="divider"></div>
+
+  <div class="stats-row">
+    <div>
+      <div style="font-size: 10px; color: #848e9c;">ВІНРЕЙТ</div>
+      <div class="winrate-big" id="winRate">0.0%</div>
+    </div>
+    <div class="mini-counts">
+      <div>Плюс (+): <span class="plus-c" id="plusCount">0</span></div>
+      <div>Мінус (−): <span class="minus-c" id="minusCount">0</span></div>
+      <div>Усього: <b id="totalCount">0</b></div>
+    </div>
   </div>
 
-  <div class="buttons">
-    <button class="btn btn-plus" id="btnPlus">+</button>
-    <button class="btn btn-minus" id="btnMinus">−</button>
+  <div class="trade-btns">
+    <button class="t-btn t-plus" id="btnPlus">+</button>
+    <button class="t-btn t-minus" id="btnMinus">−</button>
   </div>
-
-  <div class="dots" id="dots"></div>
 
   <div class="footer">
-    <button class="btn-small" id="btnUndo">↩ Назад</button>
-    <button class="btn-small" id="btnReset">🗑 Скинути</button>
+    <button class="f-btn" id="btnUndo">↩ Назад</button>
+    <button class="f-btn" id="btnReset">🗑 Скинути</button>
   </div>
 </div>
 
 <script>
-  let state = JSON.parse(localStorage.getItem('otc_simple_tracker')) || {
+  let state = JSON.parse(localStorage.getItem('autonomous_otc_app')) || {
+    apiUrl: '',
     pair: 'EURUSD_otc',
+    sound: true,
     results: []
   };
 
   let activeDoc = document;
+  let lastSignalKey = '';
 
   function getEl(id) {
     return activeDoc.getElementById(id) || document.getElementById(id);
   }
 
-  function save() {
-    localStorage.setItem('otc_simple_tracker', JSON.stringify(state));
-    render();
+  function playBeep(isCall) {
+    if (!state.sound) return;
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = isCall ? 880 : 520;
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.25);
+    } catch (e) {}
   }
 
-  // Надійна прив'язка кнопок через addEventListener (працює в обох вікнах!)
+  function saveState() {
+    localStorage.setItem('autonomous_otc_app', JSON.stringify(state));
+    renderTracker();
+  }
+
+  document.getElementById('apiUrlInput').value = state.apiUrl;
+  document.getElementById('apiUrlInput').addEventListener('change', (e) => {
+    state.apiUrl = e.target.value.trim().replace(/\/$/, '');
+    saveState();
+  });
+
   document.getElementById('pairSelect').addEventListener('change', (e) => {
     state.pair = e.target.value;
-    save();
+    lastSignalKey = '';
+    saveState();
+    pollServer();
+  });
+
+  document.getElementById('soundBtn').addEventListener('click', () => {
+    state.sound = !state.sound;
+    getEl('soundBtn').textContent = state.sound ? '🔊' : '🔇';
+    saveState();
   });
 
   document.getElementById('btnPlus').addEventListener('click', () => {
     state.results.push(true);
-    save();
+    saveState();
   });
 
   document.getElementById('btnMinus').addEventListener('click', () => {
     state.results.push(false);
-    save();
+    saveState();
   });
 
   document.getElementById('btnUndo').addEventListener('click', () => {
-    if (state.results.length > 0) {
-      state.results.pop();
-      save();
-    }
+    state.results.pop();
+    saveState();
   });
 
   document.getElementById('btnReset').addEventListener('click', () => {
     state.results = [];
-    save();
+    saveState();
   });
 
-  document.getElementById('pipBtn').addEventListener('click', openFloatingWidget);
-
-  function render() {
+  function renderTracker() {
     const total = state.results.length;
     const wins = state.results.filter(Boolean).length;
     const losses = total - wins;
@@ -260,58 +308,86 @@
     const wrEl = getEl('winRate');
     if (wrEl) {
       wrEl.textContent = `${pct.toFixed(1)}%`;
-      if (total === 0) wrEl.style.color = '#e0e3eb';
-      else if (pct >= 60) wrEl.style.color = '#00e676';
-      else if (pct >= 50) wrEl.style.color = '#f0b90b';
-      else wrEl.style.color = '#ff1744';
+      wrEl.style.color = total === 0 ? '#e0e3eb' : (pct >= 60 ? '#00e676' : (pct >= 50 ? '#f0b90b' : '#ff1744'));
     }
-
     if (getEl('plusCount')) getEl('plusCount').textContent = wins;
     if (getEl('minusCount')) getEl('minusCount').textContent = losses;
     if (getEl('totalCount')) getEl('totalCount').textContent = total;
-    if (getEl('pairSelect')) getEl('pairSelect').value = state.pair;
-
-    if (getEl('dots')) {
-      getEl('dots').textContent = state.results
-        .slice(-15)
-        .map(r => r ? '🟢' : '🔴')
-        .join('');
-    }
   }
 
-  async function openFloatingWidget() {
-    if ('documentPictureInPicture' in window) {
-      try {
-        const pipWindow = await window.documentPictureInPicture.requestWindow({
-          width: 280,
-          height: 365
-        });
+  async function pollServer() {
+    if (!state.apiUrl) return;
+    try {
+      const res = await fetch(`${state.apiUrl}/api/status?symbol=${encodeURIComponent(state.pair)}`);
+      const data = await res.json();
 
-        const styleClone = document.getElementById('mainStyles').cloneNode(true);
-        pipWindow.document.head.appendChild(styleClone);
-
-        const card = document.getElementById('trackerCard');
-        const pipBtn = document.getElementById('pipBtn');
-        pipBtn.style.display = 'none';
-
-        pipWindow.document.body.appendChild(card);
-        activeDoc = pipWindow.document;
-
-        pipWindow.addEventListener('pagehide', () => {
-          pipBtn.style.display = 'block';
-          document.body.appendChild(card);
-          activeDoc = document;
-          render();
-        });
-      } catch (err) {
-        alert("Не вдалося відкрити плаваюче вікно. Просто перетягніть вкладку у нове вузьке вікно.");
+      // Оновлюємо список пар із живими відсотками виплат
+      const sel = getEl('pairSelect');
+      if (data.pairs && data.pairs.length > 0 && sel) {
+        const currentVal = state.pair;
+        sel.innerHTML = data.pairs.map(p =>
+          `<option value="${p.symbol}" ${p.symbol === currentVal ? 'selected' : ''}>${p.payout >= 82 ? '🔥' : '🟢'} ${p.symbol} (${p.payout}%)</option>`
+        ).join('');
       }
-    } else {
-      window.open(window.location.href, 'OTCTracker', 'width=290,height=410,resizable=yes');
+
+      const box = getEl('radarBox');
+      const title = getEl('signalTitle');
+      const sub = getEl('signalSub');
+      const an = data.analysis || {};
+
+      box.className = 'radar-box';
+
+      if (!data.connected) {
+        title.textContent = '🔌 ПІДКЛЮЧЕННЯ...';
+        sub.textContent = 'З’єднання з сервером котирувань';
+      } else if (an.status === 'WARMING') {
+        title.textContent = `⏳ ПРОГРІВ ${an.collected}/${an.needed}`;
+        sub.textContent = 'Збір хвилинних свічок M1';
+      } else if (an.status === 'WAIT_CANDLE') {
+        title.textContent = `⏳ ПАУЗА ${an.wait_sec}с`;
+        sub.textContent = 'Закриття свічки — чекаємо нову';
+      } else if (an.status === 'SIGNAL') {
+        const isCall = an.direction === 'CALL';
+        box.classList.add(isCall ? 'call' : 'put');
+        title.textContent = isCall ? '⬆️ ВХІД: CALL (3с)' : '⬇️ ВХІД: PUT (3с)';
+        sub.textContent = `Ціна: ${an.price} | Сила: ${an.score} | Сек: :${String(an.sec).padStart(2, '0')}`;
+
+        const sigKey = `${state.pair}_${an.direction}_${Math.floor(Date.now() / 15000)}`;
+        if (sigKey !== lastSignalKey) {
+          lastSignalKey = sigKey;
+          playBeep(isCall);
+        }
+      } else {
+        title.textContent = '⏸ ФЛЕТ / НЕМАЄ ІМПУЛЬСУ';
+        sub.textContent = `Ціна: ${an.price || '—'} | RSI: ${an.rsi || '—'} | Сек: :${String(an.sec || 0).padStart(2, '0')}`;
+      }
+    } catch (err) {
+      if (getEl('signalTitle')) getEl('signalTitle').textContent = '⚠️ ПОМИЛКА ЗВ’ЯЗКУ';
     }
   }
 
-  render();
+  document.getElementById('pipBtn').addEventListener('click', async () => {
+    if ('documentPictureInPicture' in window) {
+      const pipWin = await window.documentPictureInPicture.requestWindow({ width: 295, height: 420 });
+      pipWin.document.head.appendChild(document.getElementById('appStyles').cloneNode(true));
+      const widget = document.getElementById('mainWidget');
+      document.getElementById('pipBtn').style.display = 'none';
+      if (state.apiUrl) document.getElementById('apiBar').style.display = 'none';
+      pipWin.document.body.appendChild(widget);
+      activeDoc = pipWin.document;
+
+      pipWin.addEventListener('pagehide', () => {
+        document.getElementById('pipBtn').style.display = 'block';
+        document.getElementById('apiBar').style.display = 'flex';
+        document.body.appendChild(widget);
+        activeDoc = document;
+        renderTracker();
+      });
+    }
+  });
+
+  renderTracker();
+  setInterval(pollServer, 1000);
 </script>
 </body>
 </html>
