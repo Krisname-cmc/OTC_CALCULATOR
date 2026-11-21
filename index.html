@@ -383,8 +383,21 @@
         activeDoc = document;
         renderTracker();
       });
+    } else {
+      // Режим компактного вигляду для планшета (iPad Slide Over / Android Спливаюче вікно)
+      const apiBar = document.getElementById('apiBar');
+      const pipBtn = document.getElementById('pipBtn');
+      if (state.apiUrl && apiBar.style.display !== 'none') {
+        apiBar.style.display = 'none';
+        pipBtn.textContent = '⚙️ Налаштування URL';
+        alert('Для закріплення поверх Pocket Option на планшеті використайте системне спливаюче вікно:\n\n• iPad: три крапки (•••) зверху екрана → Slide Over\n• Android: меню недавніх програм → іконка браузера → Спливаюче вікно');
+      } else {
+        apiBar.style.display = 'flex';
+        pipBtn.textContent = '📌 Компактний вигляд';
+      }
     }
   });
+
 
   renderTracker();
   setInterval(pollServer, 250);
