@@ -321,14 +321,19 @@
       const res = await fetch(`${state.apiUrl}/api/status?symbol=${encodeURIComponent(state.pair)}`);
       const data = await res.json();
 
-      // Оновлюємо список пар із живими відсотками виплат
+      // Оновлюємо список пар ТІЛЬКИ якщо змінилися відсотки виплат (щоб не скидати вибір на планшеті!)
       const sel = getEl('pairSelect');
       if (data.pairs && data.pairs.length > 0 && sel) {
-        const currentVal = state.pair;
-        sel.innerHTML = data.pairs.map(p =>
-          `<option value="${p.symbol}" ${p.symbol === currentVal ? 'selected' : ''}>${p.payout >= 82 ? '🔥' : '🟢'} ${p.symbol} (${p.payout}%)</option>`
-        ).join('');
+        const newHash = data.pairs.map(p => `${p.symbol}:${p.payout}`).join('|');
+        if (newHash !== window.lastPairsHash) {
+          window.lastPairsHash = newHash;
+          const currentVal = state.pair;
+          sel.innerHTML = data.pairs.map(p =>
+            `<option value="${p.symbol}" ${p.symbol === currentVal ? 'selected' : ''}>${p.payout >= 82 ? '🔥' : '🟢'} ${p.symbol} (${p.payout}%)</option>`
+          ).join('');
+        }
       }
+
 
       const box = getEl('radarBox');
       const title = getEl('signalTitle');
