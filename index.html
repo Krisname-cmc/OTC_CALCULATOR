@@ -416,13 +416,15 @@
 </div>
 
 <script>
-  let state = JSON.parse(localStorage.getItem('super_ai_pro_v2')) || {
-    apiUrl: 'https://railway.app',
+  const FIXED_API_URL = 'https://super-ai-trader-pro-production.up.railway.app';
+
+  let state = JSON.parse(localStorage.getItem('super_ai_pro_v3')) || {
     pair: 'EURUSD_otc',
     exp: '3с',
     sound: true,
     results: []
   };
+  state.apiUrl = FIXED_API_URL;
 
   let activeDoc = document;
   let lastSignalKey = '';
@@ -450,16 +452,16 @@
   }
 
   function saveState() {
-    localStorage.setItem('super_ai_pro_v2', JSON.stringify(state));
+    localStorage.setItem('super_ai_pro_v3', JSON.stringify(state));
     renderTracker();
   }
 
   const urlInput = document.getElementById('apiUrlInput');
-  urlInput.value = state.apiUrl;
-  urlInput.addEventListener('change', (e) => {
-    state.apiUrl = e.target.value.trim().replace(/\/$/, '');
-    saveState();
-  });
+  if (urlInput) {
+    urlInput.value = FIXED_API_URL;
+    urlInput.readOnly = true;
+  }
+
 
   document.getElementById('pairSelect').addEventListener('change', (e) => {
     state.pair = e.target.value;
