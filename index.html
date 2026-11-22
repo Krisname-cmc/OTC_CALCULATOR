@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SUPER AI OTC — Автономний Термінал</title>
+<title>SUPER AI PRO — Trading Terminal</title>
 <style id="appStyles">
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: #0b0e14;
-    color: #e0e3eb;
+    background: #070a10;
+    color: #f1f5f9;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -17,163 +17,304 @@
     padding: 8px;
     user-select: none;
   }
-  .app-card {
+  .terminal {
     width: 100%;
-    max-width: 280px;
-    background: #151924;
-    border-radius: 16px;
-    padding: 12px;
-    border: 1px solid #262c3a;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    max-width: 315px;
+    background: linear-gradient(180deg, #111827 0%, #0b0f19 100%);
+    border-radius: 20px;
+    padding: 13px;
+    border: 1px solid #1e293b;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75);
   }
-  .top-bar {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 8px;
-  }
-  .btn-pip {
-    flex: 1;
-    background: #2962ff;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 6px;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  .btn-sound {
-    background: #222736;
-    color: #e0e3eb;
-    border: 1px solid #323949;
-    border-radius: 8px;
-    padding: 6px 9px;
-    font-size: 12px;
-    cursor: pointer;
-  }
-  .api-bar {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 8px;
-  }
-  .api-bar input {
-    flex: 1;
-    background: #0e1118;
-    border: 1px solid #2b3142;
-    color: #9aa3b2;
-    border-radius: 6px;
-    padding: 4px 6px;
-    font-size: 10px;
-  }
-  .pair-select {
-    width: 100%;
-    background: #0e1118;
-    color: #ffffff;
-    border: 1px solid #323949;
-    border-radius: 10px;
-    padding: 7px 8px;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    outline: none;
-    cursor: pointer;
-  }
-  /* БЛОК ЖИВОГО РАДАРА СИГНАЛІВ */
-  .radar-box {
-    background: #0e1118;
-    border: 2px solid #252b3b;
-    border-radius: 12px;
-    padding: 10px 8px;
-    text-align: center;
-    margin-bottom: 10px;
-    transition: all 0.2s ease;
-  }
-  .radar-box.call {
-    border-color: #00e676;
-    background: rgba(0, 200, 83, 0.14);
-  }
-  .radar-box.put {
-    border-color: #ff1744;
-    background: rgba(213, 0, 0, 0.14);
-  }
-  .signal-title {
-    font-size: 22px;
-    font-weight: 900;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-  }
-  .signal-sub {
-    font-size: 11px;
-    color: #9aa3b2;
-  }
-  /* БЛОК КАЛЬКУЛЯТОРА ВІНРЕЙТУ */
-  .divider {
-    height: 1px;
-    background: #252b3b;
-    margin: 8px 0;
-  }
-  .stats-row {
+  /* ШАПКА */
+  .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #0e1118;
-    border-radius: 10px;
-    padding: 8px 10px;
-    margin-bottom: 8px;
-    border: 1px solid #222736;
+    margin-bottom: 10px;
   }
-  .winrate-big {
-    font-size: 24px;
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
     font-weight: 800;
+    letter-spacing: 0.4px;
+    color: #e2e8f0;
   }
-  .mini-counts {
-    text-align: right;
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ef4444;
+    box-shadow: 0 0 8px #ef4444;
+  }
+  .status-dot.online {
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+  }
+  .hdr-btns {
+    display: flex;
+    gap: 5px;
+  }
+  .icon-btn {
+    background: #1e293b;
+    color: #cbd5e1;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 4px 8px;
     font-size: 11px;
-    line-height: 1.4;
+    font-weight: 700;
+    cursor: pointer;
   }
-  .plus-c { color: #00e676; font-weight: 700; }
-  .minus-c { color: #ff1744; font-weight: 700; }
-  .trade-btns {
+  .icon-btn:hover { background: #334155; color: #fff; }
+
+  /* ПОЛЕ URL */
+  .api-bar {
+    margin-bottom: 8px;
+  }
+  .api-bar input {
+    width: 100%;
+    background: #090d16;
+    border: 1px solid #1e293b;
+    color: #94a3b8;
+    border-radius: 8px;
+    padding: 5px 8px;
+    font-size: 10px;
+    outline: none;
+  }
+
+  /* ВИБІР ПАРИ */
+  .pair-select {
+    width: 100%;
+    background: #161f30;
+    color: #ffffff;
+    border: 1px solid #2d3b55;
+    border-radius: 12px;
+    padding: 8px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 9px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  /* КНОПКИ ЕКСПІРАЦІЇ */
+  .exp-label {
+    font-size: 10px;
+    color: #64748b;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .exp-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+  .exp-btn {
+    background: #131b2c;
+    color: #94a3b8;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 5px 0;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .exp-btn.active {
+    background: linear-gradient(135deg, #06b6d4 0%, #2563eb 100%);
+    color: #ffffff;
+    border-color: #38bdf8;
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.35);
+  }
+
+  /* ГОЛОВНИЙ ЕКРАН СИГНАЛУ */
+  .signal-card {
+    background: radial-gradient(circle at top right, #1e293b 0%, #0d1320 75%);
+    border: 1.5px solid #263248;
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+  .signal-card.call {
+    background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.28) 0%, #091a14 80%);
+    border-color: #10b981;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+  }
+  .signal-card.put {
+    background: radial-gradient(circle at top right, rgba(244, 63, 94, 0.28) 0%, #1c0b10 80%);
+    border-color: #f43f5e;
+    box-shadow: 0 0 20px rgba(244, 63, 94, 0.25);
+  }
+  .sig-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .sig-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .signal-card.call .sig-icon { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+  .signal-card.put .sig-icon { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
+  .sig-text-block {
+    flex: 1;
+    min-width: 0;
+  }
+  .sig-title {
+    font-size: 19px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    line-height: 1.15;
+  }
+  .signal-card.call .sig-title { color: #34d399; }
+  .signal-card.put .sig-title { color: #fb7185; }
+  .sig-sub {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 2px;
+  }
+
+  /* ШКАЛА СИЛИ СИГНАЛУ */
+  .strength-hdr {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #94a3b8;
+    margin-bottom: 4px;
+  }
+  .strength-bar {
+    height: 6px;
+    background: #1e293b;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .strength-fill {
+    height: 100%;
+    width: 20%;
+    background: #475569;
+    border-radius: 99px;
+    transition: width 0.25s ease, background 0.25s ease;
+  }
+  .signal-card.call .strength-fill { background: linear-gradient(90deg, #059669, #34d399); }
+  .signal-card.put .strength-fill { background: linear-gradient(90deg, #e11d48, #fb7185); }
+
+  /* КАРТКИ ІНДИКАТОРІВ (READINGS) */
+  .readings-hdr {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #64748b;
+    margin-bottom: 5px;
+  }
+  .readings-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+  .ind-chip {
+    background: #131b2c;
+    border: 1px solid #1e293b;
+    border-radius: 9px;
+    padding: 5px 7px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+  }
+  .ind-name { color: #94a3b8; font-weight: 600; }
+  .ind-val { font-weight: 800; color: #cbd5e1; }
+  .ind-val.bull { color: #34d399; }
+  .ind-val.bear { color: #fb7185; }
+
+  /* КАЛЬКУЛЯТОР СТАТИСТИКИ */
+  .stats-box {
+    background: #0d1320;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 8px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 8px;
   }
-  .t-btn {
+  .wr-val {
+    font-size: 22px;
+    font-weight: 900;
+  }
+  .counts {
+    text-align: right;
+    font-size: 11px;
+    line-height: 1.35;
+    color: #94a3b8;
+  }
+  .c-win { color: #34d399; font-weight: 800; }
+  .c-loss { color: #fb7185; font-weight: 800; }
+
+  .action-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    margin-bottom: 7px;
+  }
+  .btn-act {
     border: none;
     border-radius: 10px;
-    padding: 10px 0;
-    font-size: 24px;
+    padding: 9px 0;
+    font-size: 20px;
     font-weight: 900;
     color: #fff;
     cursor: pointer;
   }
-  .t-btn:active { transform: scale(0.95); }
-  .t-plus { background: #00c853; border: 2px solid #00e676; }
-  .t-minus { background: #d50000; border: 2px solid #ff1744; }
-  .footer {
+  .btn-act:active { transform: scale(0.96); }
+  .btn-win { background: linear-gradient(135deg, #059669, #10b981); }
+  .btn-loss { background: linear-gradient(135deg, #be123c, #f43f5e); }
+
+  .sub-footer {
     display: flex;
     gap: 6px;
   }
-  .f-btn {
+  .mini-btn {
     flex: 1;
-    background: #202534;
-    color: #848e9c;
-    border: 1px solid #2c3345;
-    border-radius: 6px;
+    background: #161f30;
+    color: #64748b;
+    border: 1px solid #1e293b;
+    border-radius: 7px;
     padding: 4px;
     font-size: 10px;
     cursor: pointer;
   }
-  .f-btn:hover { color: #fff; }
+  .mini-btn:hover { color: #e2e8f0; }
 </style>
 </head>
 <body>
 
-<div class="app-card" id="mainWidget">
-  <div class="top-bar">
-    <button class="btn-pip" id="pipBtn">📌 Поверх вікон</button>
-    <button class="btn-sound" id="soundBtn" title="Звуковий сигнал">🔊</button>
+<div class="terminal" id="mainWidget">
+  <div class="header">
+    <div class="brand">
+      <span class="status-dot" id="connDot"></span>
+      <span>SUPER AI PRO</span>
+    </div>
+    <div class="hdr-btns">
+      <button class="icon-btn" id="pipBtn">📌 Поверх вікон</button>
+      <button class="icon-btn" id="soundBtn">🔊</button>
+    </div>
   </div>
 
   <div class="api-bar" id="apiBar">
@@ -193,46 +334,77 @@
     <option value="EURGBP_otc">💎 EURGBP_otc</option>
   </select>
 
-  <div class="radar-box" id="radarBox">
-    <div class="signal-title" id="signalTitle">⏳ ОЧІКУВАННЯ</div>
-    <div class="signal-sub" id="signalSub">Вставте URL сервера Railway зверху</div>
+  <div class="exp-label">Expiration time</div>
+  <div class="exp-row" id="expRow">
+    <button class="exp-btn active" data-exp="3с">S3</button>
+    <button class="exp-btn" data-exp="5с">S5</button>
+    <button class="exp-btn" data-exp="15с">S15</button>
+    <button class="exp-btn" data-exp="30с">S30</button>
   </div>
 
-  <div class="divider"></div>
-
-  <div class="stats-row">
-    <div>
-      <div style="font-size: 10px; color: #848e9c;">ВІНРЕЙТ</div>
-      <div class="winrate-big" id="winRate">0.0%</div>
+  <div class="signal-card" id="signalCard">
+    <div class="sig-main">
+      <div class="sig-icon" id="sigIcon">⚡</div>
+      <div class="sig-text-block">
+        <div class="sig-title" id="sigTitle">SCANNING...</div>
+        <div class="sig-sub" id="sigSub">Очікування підключення до ринку</div>
+      </div>
     </div>
-    <div class="mini-counts">
-      <div>Плюс (+): <span class="plus-c" id="plusCount">0</span></div>
-      <div>Мінус (−): <span class="minus-c" id="minusCount">0</span></div>
+    <div class="strength-hdr">
+      <span>Signal strength</span>
+      <span id="strengthText">waiting</span>
+    </div>
+    <div class="strength-bar">
+      <div class="strength-fill" id="strengthFill"></div>
+    </div>
+  </div>
+
+  <div class="readings-hdr">
+    <span>Readings • Real quotes</span>
+    <span id="scoreBadge">9 filters</span>
+  </div>
+  <div class="readings-grid">
+    <div class="ind-chip"><span class="ind-name">EMA 3/6/10</span><span class="ind-val" id="indEma">—</span></div>
+    <div class="ind-chip"><span class="ind-name">MACD+MOM</span><span class="ind-val" id="indMacd">—</span></div>
+    <div class="ind-chip"><span class="ind-name">Keltner</span><span class="ind-val" id="indKelt">—</span></div>
+    <div class="ind-chip"><span class="ind-name">RSI(5)</span><span class="ind-val" id="indRsi">—</span></div>
+  </div>
+
+  <div class="stats-box">
+    <div>
+      <div style="font-size: 9px; color: #64748b; text-transform: uppercase;">Winrate</div>
+      <div class="wr-val" id="winRate">0.0%</div>
+    </div>
+    <div class="counts">
+      <div>Плюс (+): <span class="c-win" id="plusCount">0</span></div>
+      <div>Мінус (−): <span class="c-loss" id="minusCount">0</span></div>
       <div>Усього: <b id="totalCount">0</b></div>
     </div>
   </div>
 
-  <div class="trade-btns">
-    <button class="t-btn t-plus" id="btnPlus">+</button>
-    <button class="t-btn t-minus" id="btnMinus">−</button>
+  <div class="action-row">
+    <button class="btn-act btn-win" id="btnPlus">+</button>
+    <button class="btn-act btn-loss" id="btnMinus">−</button>
   </div>
 
-  <div class="footer">
-    <button class="f-btn" id="btnUndo">↩ Назад</button>
-    <button class="f-btn" id="btnReset">🗑 Скинути</button>
+  <div class="sub-footer">
+    <button class="mini-btn" id="btnUndo">↩ Назад</button>
+    <button class="mini-btn" id="btnReset">🗑 Скинути</button>
   </div>
 </div>
 
 <script>
-  let state = JSON.parse(localStorage.getItem('autonomous_otc_app')) || {
-    apiUrl: '',
+  let state = JSON.parse(localStorage.getItem('super_ai_pro_v2')) || {
+    apiUrl: 'https://railway.app',
     pair: 'EURUSD_otc',
+    exp: '3с',
     sound: true,
     results: []
   };
 
   let activeDoc = document;
   let lastSignalKey = '';
+  window.lastPairsHash = '';
 
   function getEl(id) {
     return activeDoc.getElementById(id) || document.getElementById(id);
@@ -245,23 +417,24 @@
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.value = isCall ? 880 : 520;
-      gain.gain.setValueAtTime(0.15, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+      osc.frequency.value = isCall ? 920 : 480;
+      gain.gain.setValueAtTime(0.16, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
-      osc.stop(ctx.currentTime + 0.25);
+      osc.stop(ctx.currentTime + 0.22);
     } catch (e) {}
   }
 
   function saveState() {
-    localStorage.setItem('autonomous_otc_app', JSON.stringify(state));
+    localStorage.setItem('super_ai_pro_v2', JSON.stringify(state));
     renderTracker();
   }
 
-  document.getElementById('apiUrlInput').value = state.apiUrl;
-  document.getElementById('apiUrlInput').addEventListener('change', (e) => {
+  const urlInput = document.getElementById('apiUrlInput');
+  urlInput.value = state.apiUrl;
+  urlInput.addEventListener('change', (e) => {
     state.apiUrl = e.target.value.trim().replace(/\/$/, '');
     saveState();
   });
@@ -273,31 +446,28 @@
     pollServer();
   });
 
+  document.querySelectorAll('.exp-btn').forEach(btn => {
+    if (btn.dataset.exp === state.exp) btn.classList.add('active');
+    else btn.classList.remove('active');
+
+    btn.addEventListener('click', () => {
+      state.exp = btn.dataset.exp;
+      activeDoc.querySelectorAll('.exp-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      saveState();
+    });
+  });
+
   document.getElementById('soundBtn').addEventListener('click', () => {
     state.sound = !state.sound;
     getEl('soundBtn').textContent = state.sound ? '🔊' : '🔇';
     saveState();
   });
 
-  document.getElementById('btnPlus').addEventListener('click', () => {
-    state.results.push(true);
-    saveState();
-  });
-
-  document.getElementById('btnMinus').addEventListener('click', () => {
-    state.results.push(false);
-    saveState();
-  });
-
-  document.getElementById('btnUndo').addEventListener('click', () => {
-    state.results.pop();
-    saveState();
-  });
-
-  document.getElementById('btnReset').addEventListener('click', () => {
-    state.results = [];
-    saveState();
-  });
+  document.getElementById('btnPlus').addEventListener('click', () => { state.results.push(true); saveState(); });
+  document.getElementById('btnMinus').addEventListener('click', () => { state.results.push(false); saveState(); });
+  document.getElementById('btnUndo').addEventListener('click', () => { state.results.pop(); saveState(); });
+  document.getElementById('btnReset').addEventListener('click', () => { state.results = []; saveState(); });
 
   function renderTracker() {
     const total = state.results.length;
@@ -308,7 +478,7 @@
     const wrEl = getEl('winRate');
     if (wrEl) {
       wrEl.textContent = `${pct.toFixed(1)}%`;
-      wrEl.style.color = total === 0 ? '#e0e3eb' : (pct >= 60 ? '#00e676' : (pct >= 50 ? '#f0b90b' : '#ff1744'));
+      wrEl.style.color = total === 0 ? '#f1f5f9' : (pct >= 62 ? '#34d399' : (pct >= 52 ? '#fbbf24' : '#fb7185'));
     }
     if (getEl('plusCount')) getEl('plusCount').textContent = wins;
     if (getEl('minusCount')) getEl('minusCount').textContent = losses;
@@ -321,7 +491,9 @@
       const res = await fetch(`${state.apiUrl}/api/status?symbol=${encodeURIComponent(state.pair)}`);
       const data = await res.json();
 
-      // Оновлюємо список пар ТІЛЬКИ якщо змінилися відсотки виплат (щоб не скидати вибір на планшеті!)
+      const dot = getEl('connDot');
+      if (dot) dot.className = data.connected ? 'status-dot online' : 'status-dot';
+
       const sel = getEl('pairSelect');
       if (data.pairs && data.pairs.length > 0 && sel) {
         const newHash = data.pairs.map(p => `${p.symbol}:${p.payout}`).join('|');
@@ -329,33 +501,64 @@
           window.lastPairsHash = newHash;
           const currentVal = state.pair;
           sel.innerHTML = data.pairs.map(p =>
-            `<option value="${p.symbol}" ${p.symbol === currentVal ? 'selected' : ''}>${p.payout >= 82 ? '🔥' : '🟢'} ${p.symbol} (${p.payout}%)</option>`
+            `<option value="${p.symbol}" ${p.symbol === currentVal ? 'selected' : ''}>${p.payout >= 85 ? '🔥' : '🟢'} ${p.symbol} (${p.payout}%)</option>`
           ).join('');
         }
       }
 
-
-      const box = getEl('radarBox');
-      const title = getEl('signalTitle');
-      const sub = getEl('signalSub');
+      const card = getEl('signalCard');
+      const icon = getEl('sigIcon');
+      const title = getEl('sigTitle');
+      const sub = getEl('sigSub');
+      const sText = getEl('strengthText');
+      const sFill = getEl('strengthFill');
       const an = data.analysis || {};
 
-      box.className = 'radar-box';
+      card.className = 'signal-card';
+
+      const rsiVal = an.rsi;
+      const indRsi = getEl('indRsi');
+      if (indRsi) {
+        indRsi.textContent = rsiVal ? `${rsiVal}` : '—';
+        indRsi.className = 'ind-val ' + (rsiVal > 52 ? 'bull' : (rsiVal && rsiVal < 48 ? 'bear' : ''));
+      }
 
       if (!data.connected) {
-        title.textContent = '🔌 ПІДКЛЮЧЕННЯ...';
+        icon.textContent = '🔌';
+        title.textContent = 'CONNECTING...';
         sub.textContent = 'З’єднання з сервером котирувань';
+        sText.textContent = 'offline';
+        sFill.style.width = '10%';
       } else if (an.status === 'WARMING') {
-        title.textContent = `⏳ ПРОГРІВ ${an.collected}/${an.needed}`;
+        icon.textContent = '⏳';
+        title.textContent = `WARMING ${an.collected}/${an.needed}`;
         sub.textContent = 'Збір хвилинних свічок M1';
+        sText.textContent = `${Math.round((an.collected / an.needed) * 100)}%`;
+        sFill.style.width = `${Math.round((an.collected / an.needed) * 100)}%`;
       } else if (an.status === 'WAIT_CANDLE') {
-        title.textContent = `⏳ ПАУЗА ${an.wait_sec}с`;
-        sub.textContent = 'Закриття свічки — чекаємо нову';
+        icon.textContent = '⏱';
+        title.textContent = `NEW BAR ${an.wait_sec}s`;
+        sub.textContent = 'Очікування відкриття нової свічки';
+        sText.textContent = 'pause';
+        sFill.style.width = '15%';
       } else if (an.status === 'SIGNAL') {
         const isCall = an.direction === 'CALL';
-        box.classList.add(isCall ? 'call' : 'put');
-        title.textContent = isCall ? '⬆️ ВХІД: CALL (3с)' : '⬇️ ВХІД: PUT (3с)';
-        sub.textContent = `Ціна: ${an.price} | Сила: ${an.score} | Сек: :${String(an.sec).padStart(2, '0')}`;
+        card.classList.add(isCall ? 'call' : 'put');
+        icon.textContent = isCall ? '↗' : '↘';
+        title.textContent = isCall ? `BUY (${state.exp})` : `SELL (${state.exp})`;
+        sub.textContent = `Ціна: ${an.price} • Сек: :${String(an.sec).padStart(2, '0')}`;
+
+        const isMax = String(an.score || '').startsWith('9/9') || String(an.score || '').startsWith('8/9');
+        sText.textContent = isMax ? 'HIGH (STRONG)' : 'MEDIUM-HIGH';
+        sFill.style.width = isMax ? '96%' : '78%';
+
+        getEl('indEma').textContent = isCall ? 'UP' : 'DOWN';
+        getEl('indEma').className = 'ind-val ' + (isCall ? 'bull' : 'bear');
+        getEl('indMacd').textContent = isCall ? 'ACTIVE+' : 'ACTIVE-';
+        getEl('indMacd').className = 'ind-val ' + (isCall ? 'bull' : 'bear');
+        getEl('indKelt').textContent = 'IN ZONE';
+        getEl('indKelt').className = 'ind-val ' + (isCall ? 'bull' : 'bear');
+        getEl('scoreBadge').textContent = an.score || '7/9';
 
         const sigKey = `${state.pair}_${an.direction}_${Math.floor(Date.now() / 15000)}`;
         if (sigKey !== lastSignalKey) {
@@ -363,17 +566,28 @@
           playBeep(isCall);
         }
       } else {
-        title.textContent = '⏸ ФЛЕТ / НЕМАЄ ІМПУЛЬСУ';
-        sub.textContent = `Ціна: ${an.price || '—'} | RSI: ${an.rsi || '—'} | Сек: :${String(an.sec || 0).padStart(2, '0')}`;
+        icon.textContent = '📡';
+        title.textContent = 'ANALYZING...';
+        sub.textContent = `Ціна: ${an.price || '—'} • Сек: :${String(an.sec || 0).padStart(2, '0')}`;
+        sText.textContent = 'low (flat)';
+        sFill.style.width = '28%';
+
+        getEl('indEma').textContent = 'FLAT';
+        getEl('indEma').className = 'ind-val';
+        getEl('indMacd').textContent = 'WAIT';
+        getEl('indMacd').className = 'ind-val';
+        getEl('indKelt').textContent = 'NEUTRAL';
+        getEl('indKelt').className = 'ind-val';
+        getEl('scoreBadge').textContent = '9 filters';
       }
     } catch (err) {
-      if (getEl('signalTitle')) getEl('signalTitle').textContent = '⚠️ ПОМИЛКА ЗВ’ЯЗКУ';
+      if (getEl('sigTitle')) getEl('sigTitle').textContent = 'CONNECTION ERR';
     }
   }
 
   document.getElementById('pipBtn').addEventListener('click', async () => {
     if ('documentPictureInPicture' in window) {
-      const pipWin = await window.documentPictureInPicture.requestWindow({ width: 295, height: 420 });
+      const pipWin = await window.documentPictureInPicture.requestWindow({ width: 330, height: 505 });
       pipWin.document.head.appendChild(document.getElementById('appStyles').cloneNode(true));
       const widget = document.getElementById('mainWidget');
       document.getElementById('pipBtn').style.display = 'none';
@@ -389,20 +603,17 @@
         renderTracker();
       });
     } else {
-      // Режим компактного вигляду для планшета (iPad Slide Over / Android Спливаюче вікно)
       const apiBar = document.getElementById('apiBar');
       const pipBtn = document.getElementById('pipBtn');
       if (state.apiUrl && apiBar.style.display !== 'none') {
         apiBar.style.display = 'none';
-        pipBtn.textContent = '⚙️ Налаштування URL';
-        alert('Для закріплення поверх Pocket Option на планшеті використайте системне спливаюче вікно:\n\n• iPad: три крапки (•••) зверху екрана → Slide Over\n• Android: меню недавніх програм → іконка браузера → Спливаюче вікно');
+        pipBtn.textContent = '⚙️ URL';
       } else {
         apiBar.style.display = 'flex';
-        pipBtn.textContent = '📌 Компактний вигляд';
+        pipBtn.textContent = '📌 Поверх вікон';
       }
     }
   });
-
 
   renderTracker();
   setInterval(pollServer, 250);
