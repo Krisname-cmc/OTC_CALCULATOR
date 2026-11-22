@@ -530,11 +530,13 @@
         sText.textContent = 'offline';
         sFill.style.width = '10%';
       } else if (an.status === 'WARMING') {
+        const leftMins = Math.max(1, an.needed - an.collected);
+        const pctWarm = Math.round((an.collected / an.needed) * 100);
         icon.textContent = '⏳';
-        title.textContent = `WARMING ${an.collected}/${an.needed}`;
-        sub.textContent = 'Збір хвилинних свічок M1';
-        sText.textContent = `${Math.round((an.collected / an.needed) * 100)}%`;
-        sFill.style.width = `${Math.round((an.collected / an.needed) * 100)}%`;
+        title.textContent = `ЗБІР СВІЧОК ${an.collected}/${an.needed}`;
+        sub.textContent = `Залишилось чекати: ~${leftMins} хв (M1)`;
+        sText.textContent = `${pctWarm}%`;
+        sFill.style.width = `${pctWarm}%`;
       } else if (an.status === 'WAIT_CANDLE') {
         icon.textContent = '⏱';
         title.textContent = `NEW BAR ${an.wait_sec}s`;
