@@ -522,11 +522,16 @@
         if (newHash !== window.lastPairsHash) {
           window.lastPairsHash = newHash;
           const currentVal = state.pair;
-          sel.innerHTML = data.pairs.map(p =>
-            `<option value="${p.symbol}" ${p.symbol === currentVal ? 'selected' : ''}>${p.payout >= 85 ? '🔥' : '🟢'} ${p.symbol} (${p.payout}%)</option>`
-          ).join('');
+          sel.innerHTML = data.pairs.map(p => {
+            let badge = '🔴';
+            if (p.payout >= 90) badge = '🔥';
+            else if (p.payout >= 85) badge = '🟢';
+            else if (p.payout >= 78) badge = '🟡';
+            return `<option value="${p.symbol}" ${p.symbol === currentVal ? 'selected' : ''}>${badge} ${p.symbol} — ${p.payout}%</option>`;
+          }).join('');
         }
       }
+
 
       const card = getEl('signalCard');
       const icon = getEl('sigIcon');
@@ -640,6 +645,7 @@
   });
 
   renderTracker();
+  pollServer();
   setInterval(pollServer, 250);
 </script>
 </body>
