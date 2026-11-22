@@ -587,7 +587,7 @@
         title.textContent = isCall ? `BUY • ${targetExp}` : `SELL • ${targetExp}`;
         sub.textContent = `Ціна: ${an.price} • Сек: :${String(an.sec).padStart(2, '0')}`;
 
-        const isMax = String(an.score || '').startsWith('9/9') || String(an.score || '').startsWith('8/9');
+        const isMax = String(an.score || '').startsWith('10/10') || String(an.score || '').startsWith('9/10');
         sText.textContent = isMax ? 'HIGH (STRONG)' : 'MEDIUM-HIGH';
         sFill.style.width = isMax ? '96%' : '78%';
 
