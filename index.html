@@ -356,12 +356,12 @@
     <option value="BTCUSD_otc">₿ BTCUSD_otc</option>
   </select>
 
-  <div class="exp-label">Expiration time</div>
+  <div class="exp-label">Рекомендована експірація (AI Auto)</div>
   <div class="exp-row" id="expRow">
-    <button class="exp-btn active" data-exp="3с">S3</button>
-    <button class="exp-btn" data-exp="5с">S5</button>
-    <button class="exp-btn" data-exp="15с">S15</button>
     <button class="exp-btn" data-exp="30с">S30</button>
+    <button class="exp-btn active" data-exp="1m">M1</button>
+    <button class="exp-btn" data-exp="2m">M2</button>
+    <button class="exp-btn" data-exp="3m">M3</button>
   </div>
 
   <div class="signal-card" id="signalCard">
@@ -574,9 +574,17 @@
         sFill.style.width = '15%';
       } else if (an.status === 'SIGNAL') {
         const isCall = an.direction === 'CALL';
+        const targetExp = an.rec_exp || state.exp || '1m';
+        state.exp = targetExp;
+
+        activeDoc.querySelectorAll('.exp-btn').forEach(b => {
+          if (b.dataset.exp === targetExp) b.classList.add('active');
+          else b.classList.remove('active');
+        });
+
         card.classList.add(isCall ? 'call' : 'put');
         icon.textContent = isCall ? '↗' : '↘';
-        title.textContent = isCall ? `BUY (${state.exp})` : `SELL (${state.exp})`;
+        title.textContent = isCall ? `BUY • ${targetExp}` : `SELL • ${targetExp}`;
         sub.textContent = `Ціна: ${an.price} • Сек: :${String(an.sec).padStart(2, '0')}`;
 
         const isMax = String(an.score || '').startsWith('9/9') || String(an.score || '').startsWith('8/9');
