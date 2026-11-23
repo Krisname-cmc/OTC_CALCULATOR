@@ -300,7 +300,7 @@
 </div>
 
 <script>
-  const DEFAULT_API = 'https://railway.app';
+  const DEFAULT_API = 'https://super-ai-trader-pro-production.up.railway.app';
   const STORAGE_KEY = 'super_ai_pro_m1_clean';
   let activeDoc = document;
   let lastSignalKey = '';
@@ -318,7 +318,7 @@
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
     if (saved && typeof saved === 'object') {
-      state = { ...state, ...saved, apiUrl: saved.apiUrl || DEFAULT_API };
+      state = { ...state, ...saved, apiUrl: DEFAULT_API };
     }
   } catch (e) {}
 
