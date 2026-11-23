@@ -514,6 +514,12 @@
     try {
       const res = await fetch(`${state.apiUrl}/api/status?symbol=${encodeURIComponent(state.pair)}`);
       const data = await res.json();
+      const an = data.analysis || {};
+      const indSar = getEl('indSar');
+      if (indSar && an.sar) {
+        indSar.textContent = an.sar;
+        indSar.className = 'ind-val ' + (an.sar === 'BUY' ? 'bull' : 'bear');
+      }
 
       const dot = getEl('connDot');
       if (dot) dot.className = data.connected ? 'status-dot online' : 'status-dot';
