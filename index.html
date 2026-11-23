@@ -1,358 +1,248 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SUPER AI PRO — Trading Terminal</title>
-<style id="appStyles">
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #070a10;
-    color: #f1f5f9;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 8px;
-    user-select: none;
-  }
-  .terminal {
-    width: 100%;
-    max-width: 315px;
-    background: linear-gradient(180deg, #111827 0%, #0b0f19 100%);
-    border-radius: 20px;
-    padding: 13px;
-    border: 1px solid #1e293b;
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75);
-  }
-  /* ШАПКА */
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 0.4px;
-    color: #e2e8f0;
-  }
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #ef4444;
-    box-shadow: 0 0 8px #ef4444;
-  }
-  .status-dot.online {
-    background: #10b981;
-    box-shadow: 0 0 8px #10b981;
-  }
-  .hdr-btns {
-    display: flex;
-    gap: 5px;
-  }
-  .icon-btn {
-    background: #1e293b;
-    color: #cbd5e1;
-    border: 1px solid #334155;
-    border-radius: 8px;
-    padding: 4px 8px;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  .icon-btn:hover { background: #334155; color: #fff; }
-
-  /* ПОЛЕ URL */
-  .api-bar {
-    margin-bottom: 8px;
-  }
-  .api-bar input {
-    width: 100%;
-    background: #090d16;
-    border: 1px solid #1e293b;
-    color: #94a3b8;
-    border-radius: 8px;
-    padding: 5px 8px;
-    font-size: 10px;
-    outline: none;
-  }
-
-  /* ВИБІР ПАРИ */
-  .pair-select {
-    width: 100%;
-    background: #161f30;
-    color: #ffffff;
-    border: 1px solid #2d3b55;
-    border-radius: 12px;
-    padding: 8px 10px;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 9px;
-    outline: none;
-    cursor: pointer;
-  }
-
-  /* КНОПКИ ЕКСПІРАЦІЇ */
-  .exp-label {
-    font-size: 10px;
-    color: #64748b;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .exp-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 5px;
-    margin-bottom: 10px;
-  }
-  .exp-btn {
-    background: #131b2c;
-    color: #94a3b8;
-    border: 1px solid #1e293b;
-    border-radius: 8px;
-    padding: 5px 0;
-    font-size: 11px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .exp-btn.active {
-    background: linear-gradient(135deg, #06b6d4 0%, #2563eb 100%);
-    color: #ffffff;
-    border-color: #38bdf8;
-    box-shadow: 0 0 12px rgba(6, 182, 212, 0.35);
-  }
-
-  /* ГОЛОВНИЙ ЕКРАН СИГНАЛУ */
-  .signal-card {
-    background: radial-gradient(circle at top right, #1e293b 0%, #0d1320 75%);
-    border: 1.5px solid #263248;
-    border-radius: 16px;
-    padding: 12px;
-    margin-bottom: 10px;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.2s ease;
-  }
-  .signal-card.call {
-    background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.28) 0%, #091a14 80%);
-    border-color: #10b981;
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
-  }
-  .signal-card.put {
-    background: radial-gradient(circle at top right, rgba(244, 63, 94, 0.28) 0%, #1c0b10 80%);
-    border-color: #f43f5e;
-    box-shadow: 0 0 20px rgba(244, 63, 94, 0.25);
-  }
-  .sig-main {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  .sig-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.06);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    font-weight: 900;
-    flex-shrink: 0;
-  }
-  .signal-card.call .sig-icon { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-  .signal-card.put .sig-icon { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
-  .sig-text-block {
-    flex: 1;
-    min-width: 0;
-  }
-  .sig-title {
-    font-size: 19px;
-    font-weight: 900;
-    letter-spacing: 0.5px;
-    line-height: 1.15;
-  }
-  .signal-card.call .sig-title { color: #34d399; }
-  .signal-card.put .sig-title { color: #fb7185; }
-  .sig-sub {
-    font-size: 11px;
-    color: #94a3b8;
-    margin-top: 2px;
-  }
-
-  /* ШКАЛА СИЛИ СИГНАЛУ */
-  .strength-hdr {
-    display: flex;
-    justify-content: space-between;
-    font-size: 10px;
-    color: #94a3b8;
-    margin-bottom: 4px;
-  }
-  .strength-bar {
-    height: 6px;
-    background: #1e293b;
-    border-radius: 99px;
-    overflow: hidden;
-  }
-  .strength-fill {
-    height: 100%;
-    width: 20%;
-    background: #475569;
-    border-radius: 99px;
-    transition: width 0.25s ease, background 0.25s ease;
-  }
-  .signal-card.call .strength-fill { background: linear-gradient(90deg, #059669, #34d399); }
-  .signal-card.put .strength-fill { background: linear-gradient(90deg, #e11d48, #fb7185); }
-
-  /* КАРТКИ ІНДИКАТОРІВ (READINGS) */
-  .readings-hdr {
-    display: flex;
-    justify-content: space-between;
-    font-size: 10px;
-    color: #64748b;
-    margin-bottom: 5px;
-  }
-  .readings-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5px;
-    margin-bottom: 10px;
-  }
-  .ind-chip {
-    background: #131b2c;
-    border: 1px solid #1e293b;
-    border-radius: 9px;
-    padding: 5px 7px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 10px;
-  }
-  .ind-name { color: #94a3b8; font-weight: 600; }
-  .ind-val { font-weight: 800; color: #cbd5e1; }
-  .ind-val.bull { color: #34d399; }
-  .ind-val.bear { color: #fb7185; }
-
-  /* КАЛЬКУЛЯТОР СТАТИСТИКИ */
-  .stats-box {
-    background: #0d1320;
-    border: 1px solid #1e293b;
-    border-radius: 12px;
-    padding: 8px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-  .wr-val {
-    font-size: 22px;
-    font-weight: 900;
-  }
-  .counts {
-    text-align: right;
-    font-size: 11px;
-    line-height: 1.35;
-    color: #94a3b8;
-  }
-  .c-win { color: #34d399; font-weight: 800; }
-  .c-loss { color: #fb7185; font-weight: 800; }
-
-  .action-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 7px;
-    margin-bottom: 7px;
-  }
-  .btn-act {
-    border: none;
-    border-radius: 10px;
-    padding: 9px 0;
-    font-size: 20px;
-    font-weight: 900;
-    color: #fff;
-    cursor: pointer;
-  }
-  .btn-act:active { transform: scale(0.96); }
-  .btn-win { background: linear-gradient(135deg, #059669, #10b981); }
-  .btn-loss { background: linear-gradient(135deg, #be123c, #f43f5e); }
-
-  .sub-footer {
-    display: flex;
-    gap: 6px;
-  }
-  .mini-btn {
-    flex: 1;
-    background: #161f30;
-    color: #64748b;
-    border: 1px solid #1e293b;
-    border-radius: 7px;
-    padding: 4px;
-    font-size: 10px;
-    cursor: pointer;
-  }
-  .mini-btn:hover { color: #e2e8f0; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SUPER AI PRO — Trading Terminal</title>
+  <style id="appStyles">
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    body {
+      background: #090d16;
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 10px;
+    }
+    .widget {
+      width: 100%;
+      max-width: 340px;
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      color: #e2e8f0;
+    }
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+      transition: 0.3s;
+    }
+    .status-dot.online {
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+    }
+    .top-actions { display: flex; gap: 6px; }
+    .icon-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .icon-btn:hover { background: #334155; }
+    select {
+      width: 100%;
+      background: #0f172a;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 9px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      outline: none;
+    }
+    .exp-label {
+      font-size: 10px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 5px;
+    }
+    .exp-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .exp-btn {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      color: #94a3b8;
+      padding: 6px 0;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .exp-btn.active {
+      background: #2563eb;
+      border-color: #3b82f6;
+      color: #ffffff;
+    }
+    .signal-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 14px;
+      padding: 14px 12px;
+      text-align: center;
+      margin-bottom: 10px;
+      transition: 0.25s;
+    }
+    .signal-card.call {
+      background: rgba(16, 185, 129, 0.14);
+      border-color: #10b981;
+    }
+    .signal-card.put {
+      background: rgba(239, 68, 68, 0.14);
+      border-color: #ef4444;
+    }
+    .sig-icon { font-size: 26px; margin-bottom: 4px; }
+    .sig-title { font-size: 19px; font-weight: 900; letter-spacing: 0.5px; margin-bottom: 3px; }
+    .signal-card.call .sig-title { color: #34d399; }
+    .signal-card.put .sig-title { color: #f87171; }
+    .sig-sub { font-size: 11px; color: #94a3b8; margin-bottom: 10px; }
+    .strength-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+    .bar-bg {
+      width: 100%;
+      height: 5px;
+      background: #1e293b;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      width: 20%;
+      background: #3b82f6;
+      transition: width 0.3s;
+    }
+    .signal-card.call .bar-fill { background: #10b981; }
+    .signal-card.put .bar-fill { background: #ef4444; }
+    .readings-title {
+      font-size: 10px;
+      color: #64748b;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .readings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .ind-chip {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 6px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+    }
+    .ind-name { color: #94a3b8; }
+    .ind-val { font-weight: 800; color: #e2e8f0; }
+    .ind-val.bull { color: #34d399; }
+    .ind-val.bear { color: #f87171; }
+    .stats-box {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 10px;
+    }
+    .stats-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .winrate { font-size: 18px; font-weight: 900; color: #38bdf8; }
+    .counts { font-size: 11px; color: #94a3b8; }
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+    .btn-win {
+      background: #10b981;
+      color: #052e16;
+      border: none;
+      border-radius: 8px;
+      padding: 8px;
+      font-weight: 900;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-loss {
+      background: #ef4444;
+      color: #450a0a;
+      border: none;
+      border-radius: 8px;
+      padding: 8px;
+      font-weight: 900;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .sub-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .sub-btn {
+      background: #1e293b;
+      color: #94a3b8;
+      border: none;
+      border-radius: 6px;
+      padding: 5px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-
-<div class="terminal" id="mainWidget">
+<div class="widget" id="appWidget">
   <div class="header">
     <div class="brand">
       <span class="status-dot" id="connDot"></span>
       <span>SUPER AI PRO</span>
     </div>
-    <div class="hdr-btns">
-      <button class="icon-btn" id="pipBtn">📌 Поверх вікон</button>
-      <button class="icon-btn" id="soundBtn">🔊</button>
+    <div class="top-actions">
+      <button class="icon-btn" id="btnPip">📌 Поверх вікон</button>
+      <button class="icon-btn" id="btnSound">🔊</button>
     </div>
   </div>
 
-  <div class="api-bar" id="apiBar">
-    <input type="text" id="apiUrlInput" placeholder="https://railway.app">
-  </div>
-
-  <select id="pairSelect" class="pair-select">
+  <select id="pairSelect">
     <option value="EURUSD_otc">💎 EURUSD_otc</option>
     <option value="GBPUSD_otc">💎 GBPUSD_otc</option>
     <option value="USDJPY_otc">💎 USDJPY_otc</option>
     <option value="AUDUSD_otc">💎 AUDUSD_otc</option>
     <option value="USDCAD_otc">💎 USDCAD_otc</option>
     <option value="USDCHF_otc">💎 USDCHF_otc</option>
-    <option value="EURJPY_otc">💎 EURJPY_otc</option>
-    <option value="GBPJPY_otc">💎 GBPJPY_otc</option>
     <option value="AUDCAD_otc">💎 AUDCAD_otc</option>
-    <option value="EURGBP_otc">💎 EURGBP_otc</option>
-    <option value="NZDUSD_otc">💎 NZDUSD_otc</option>
-    <option value="EURCHF_otc">💎 EURCHF_otc</option>
-    <option value="EURAUD_otc">💎 EURAUD_otc</option>
-    <option value="EURNZD_otc">💎 EURNZD_otc</option>
-    <option value="GBPAUD_otc">💎 GBPAUD_otc</option>
-    <option value="GBPCAD_otc">💎 GBPCAD_otc</option>
-    <option value="GBPCHF_otc">💎 GBPCHF_otc</option>
-    <option value="AUDJPY_otc">💎 AUDJPY_otc</option>
-    <option value="CADJPY_otc">💎 CADJPY_otc</option>
-    <option value="CHFJPY_otc">💎 CHFJPY_otc</option>
     <option value="AUDNZD_otc">💎 AUDNZD_otc</option>
-    <option value="CADCHF_otc">💎 CADCHF_otc</option>
-    <option value="NZDCAD_otc">💎 NZDCAD_otc</option>
-    <option value="NZDCHF_otc">💎 NZDCHF_otc</option>
-    <option value="NZDJPY_otc">💎 NZDJPY_otc</option>
-    <option value="USDBRL_otc">💎 USDBRL_otc</option>
-    <option value="USDMXN_otc">💎 USDMXN_otc</option>
-    <option value="USDINR_otc">💎 USDINR_otc</option>
     <option value="XAUUSD_otc">🥇 XAUUSD_otc</option>
-    <option value="XAGUSD_otc">🥈 XAGUSD_otc</option>
-    <option value="UKBrent_otc">🛢 UKBrent_otc</option>
     <option value="BTCUSD_otc">₿ BTCUSD_otc</option>
   </select>
 
@@ -365,25 +255,19 @@
   </div>
 
   <div class="signal-card" id="signalCard">
-    <div class="sig-main">
-      <div class="sig-icon" id="sigIcon">⚡</div>
-      <div class="sig-text-block">
-        <div class="sig-title" id="sigTitle">SCANNING...</div>
-        <div class="sig-sub" id="sigSub">Очікування підключення до ринку</div>
-      </div>
-    </div>
-    <div class="strength-hdr">
+    <div class="sig-icon" id="sigIcon">⚡</div>
+    <div class="sig-title" id="sigTitle">SCANNING...</div>
+    <div class="sig-sub" id="sigSub">Очікування підключення до ринку</div>
+    <div class="strength-head">
       <span>Signal strength</span>
       <span id="strengthText">waiting</span>
     </div>
-    <div class="strength-bar">
-      <div class="strength-fill" id="strengthFill"></div>
-    </div>
+    <div class="bar-bg"><div class="bar-fill" id="strengthFill"></div></div>
   </div>
 
-  <div class="readings-hdr">
+  <div class="readings-title">
     <span>Readings • Real quotes</span>
-    <span id="scoreBadge">9 filters</span>
+    <span>4 core filters</span>
   </div>
   <div class="readings-grid">
     <div class="ind-chip"><span class="ind-name">SAR(0.02)</span><span class="ind-val" id="indSar">—</span></div>
@@ -393,25 +277,25 @@
   </div>
 
   <div class="stats-box">
-    <div>
-      <div style="font-size: 9px; color: #64748b; text-transform: uppercase;">Winrate</div>
-      <div class="wr-val" id="winRate">0.0%</div>
+    <div class="stats-top">
+      <div>
+        <div style="font-size:10px;color:#64748b;">Winrate</div>
+        <div class="winrate" id="winRateVal">0.0%</div>
+      </div>
+      <div class="counts">
+        <div>Плюс (+): <b id="countWin" style="color:#34d399;">0</b></div>
+        <div>Мінус (−): <b id="countLoss" style="color:#f87171;">0</b></div>
+        <div>Усього: <b id="countTotal">0</b></div>
+      </div>
     </div>
-    <div class="counts">
-      <div>Плюс (+): <span class="c-win" id="plusCount">0</span></div>
-      <div>Мінус (−): <span class="c-loss" id="minusCount">0</span></div>
-      <div>Усього: <b id="totalCount">0</b></div>
+    <div class="btn-row">
+      <button class="btn-win" id="btnWin">+</button>
+      <button class="btn-loss" id="btnLoss">−</button>
     </div>
-  </div>
-
-  <div class="action-row">
-    <button class="btn-act btn-win" id="btnPlus">+</button>
-    <button class="btn-act btn-loss" id="btnMinus">−</button>
-  </div>
-
-  <div class="sub-footer">
-    <button class="mini-btn" id="btnUndo">↩ Назад</button>
-    <button class="mini-btn" id="btnReset">🗑 Скинути</button>
+    <div class="sub-btns">
+      <button class="sub-btn" id="btnUndo">↩ Назад</button>
+      <button class="sub-btn" id="btnReset">🗑 Скинути</button>
+    </div>
   </div>
 </div>
 
