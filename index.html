@@ -416,97 +416,138 @@
 </div>
 
 <script>
-  const FIXED_API_URL = 'https://super-ai-trader-pro-production.up.railway.app';
-
-  let state = JSON.parse(localStorage.getItem('super_ai_pro_v3')) || {
-    pair: 'EURUSD_otc',
-    exp: '3с',
-    sound: true,
-    results: []
-  };
-  state.apiUrl = FIXED_API_URL;
-
+  const DEFAULT_API = 'https://railway.app';
+  const STORAGE_KEY = 'super_ai_pro_m1_clean';
   let activeDoc = document;
   let lastSignalKey = '';
-  window.lastPairsHash = '';
+
+  let state = {
+    apiUrl: DEFAULT_API,
+    pair: 'EURUSD_otc',
+    exp: '1m',
+    sound: true,
+    wins: 0,
+    losses: 0,
+    history: []
+  };
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    if (saved && typeof saved === 'object') {
+      state = { ...state, ...saved, apiUrl: saved.apiUrl || DEFAULT_API };
+    }
+  } catch (e) {}
+
+  function saveState() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
 
   function getEl(id) {
     return activeDoc.getElementById(id) || document.getElementById(id);
   }
 
-  function playBeep(isCall) {
+  function playBeep(type) {
     if (!state.sound) return;
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = isCall ? 920 : 480;
-      gain.gain.setValueAtTime(0.16, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
       osc.connect(gain);
       gain.connect(ctx.destination);
+      osc.frequency.value = type === 'call' ? 880 : 440;
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
       osc.start();
-      osc.stop(ctx.currentTime + 0.22);
+      osc.stop(ctx.currentTime + 0.18);
     } catch (e) {}
   }
 
-  function saveState() {
-    localStorage.setItem('super_ai_pro_v3', JSON.stringify(state));
-    renderTracker();
+  function render() {
+    const total = state.wins + state.losses;
+    const rate = total > 0 ? ((state.wins / total) * 100).toFixed(1) : '0.0';
+    const wEl = getEl('winRateVal');
+    const cW = getEl('countWin');
+    const cL = getEl('countLoss');
+    const cT = getEl('countTotal');
+    if (wEl) wEl.textContent = `${rate}%`;
+    if (cW) cW.textContent = state.wins;
+    if (cL) cL.textContent = state.losses;
+    if (cT) cT.textContent = total;
   }
 
-  const urlInput = document.getElementById('apiUrlInput');
-  if (urlInput) {
-    urlInput.value = FIXED_API_URL;
-    urlInput.readOnly = true;
-  }
-
-
-  document.getElementById('pairSelect').addEventListener('change', (e) => {
-    state.pair = e.target.value;
-    lastSignalKey = '';
-    saveState();
-    pollServer();
-  });
-
-  document.querySelectorAll('.exp-btn').forEach(btn => {
-    if (btn.dataset.exp === state.exp) btn.classList.add('active');
-    else btn.classList.remove('active');
-
-    btn.addEventListener('click', () => {
-      state.exp = btn.dataset.exp;
-      activeDoc.querySelectorAll('.exp-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      saveState();
-    });
-  });
-
-  document.getElementById('soundBtn').addEventListener('click', () => {
-    state.sound = !state.sound;
-    getEl('soundBtn').textContent = state.sound ? '🔊' : '🔇';
-    saveState();
-  });
-
-  document.getElementById('btnPlus').addEventListener('click', () => { state.results.push(true); saveState(); });
-  document.getElementById('btnMinus').addEventListener('click', () => { state.results.push(false); saveState(); });
-  document.getElementById('btnUndo').addEventListener('click', () => { state.results.pop(); saveState(); });
-  document.getElementById('btnReset').addEventListener('click', () => { state.results = []; saveState(); });
-
-  function renderTracker() {
-    const total = state.results.length;
-    const wins = state.results.filter(Boolean).length;
-    const losses = total - wins;
-    const pct = total > 0 ? ((wins / total) * 100) : 0;
-
-    const wrEl = getEl('winRate');
-    if (wrEl) {
-      wrEl.textContent = `${pct.toFixed(1)}%`;
-      wrEl.style.color = total === 0 ? '#f1f5f9' : (pct >= 62 ? '#34d399' : (pct >= 52 ? '#fbbf24' : '#fb7185'));
+  function bindEvents(doc) {
+    const pairSel = doc.getElementById('pairSelect');
+    if (pairSel) {
+      pairSel.value = state.pair;
+      pairSel.onchange = (e) => {
+        state.pair = e.target.value;
+        saveState();
+        pollServer();
+      };
     }
-    if (getEl('plusCount')) getEl('plusCount').textContent = wins;
-    if (getEl('minusCount')) getEl('minusCount').textContent = losses;
-    if (getEl('totalCount')) getEl('totalCount').textContent = total;
+
+    doc.querySelectorAll('.exp-btn').forEach(btn => {
+      if (btn.dataset.exp === state.exp) btn.classList.add('active');
+      else btn.classList.remove('active');
+      btn.onclick = () => {
+        doc.querySelectorAll('.exp-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.exp = btn.dataset.exp;
+        saveState();
+      };
+    });
+
+    const btnWin = doc.getElementById('btnWin');
+    if (btnWin) btnWin.onclick = () => { state.wins++; state.history.push('W'); saveState(); render(); };
+
+    const btnLoss = doc.getElementById('btnLoss');
+    if (btnLoss) btnLoss.onclick = () => { state.losses++; state.history.push('L'); saveState(); render(); };
+
+    const btnUndo = doc.getElementById('btnUndo');
+    if (btnUndo) btnUndo.onclick = () => {
+      const last = state.history.pop();
+      if (last === 'W' && state.wins > 0) state.wins--;
+      if (last === 'L' && state.losses > 0) state.losses--;
+      saveState();
+      render();
+    };
+
+    const btnReset = doc.getElementById('btnReset');
+    if (btnReset) btnReset.onclick = () => {
+      state.wins = 0; state.losses = 0; state.history = [];
+      saveState();
+      render();
+    };
+
+    const btnSound = doc.getElementById('btnSound');
+    if (btnSound) {
+      btnSound.textContent = state.sound ? '🔊' : '🔇';
+      btnSound.onclick = () => {
+        state.sound = !state.sound;
+        btnSound.textContent = state.sound ? '🔊' : '🔇';
+        saveState();
+      };
+    }
+
+    const btnPip = doc.getElementById('btnPip');
+    if (btnPip && 'documentPictureInPicture' in window) {
+      btnPip.onclick = async () => {
+        try {
+          const pipWin = await window.documentPictureInPicture.requestWindow({ width: 340, height: 590 });
+          const style = document.getElementById('appStyles');
+          if (style) pipWin.document.head.appendChild(style.cloneNode(true));
+          const widget = document.getElementById('appWidget');
+          if (widget) pipWin.document.body.appendChild(widget);
+          activeDoc = pipWin.document;
+          bindEvents(activeDoc);
+          pipWin.addEventListener('pagehide', () => {
+            document.body.appendChild(widget);
+            activeDoc = document;
+            bindEvents(activeDoc);
+          });
+        } catch (e) {}
+      };
+    }
   }
 
   async function pollServer() {
@@ -515,31 +556,26 @@
       const res = await fetch(`${state.apiUrl}/api/status?symbol=${encodeURIComponent(state.pair)}`);
       const data = await res.json();
       const an = data.analysis || {};
-      const indSar = getEl('indSar');
-      if (indSar && an.sar) {
-        indSar.textContent = an.sar;
-        indSar.className = 'ind-val ' + (an.sar === 'BUY' ? 'bull' : 'bear');
-      }
 
       const dot = getEl('connDot');
       if (dot) dot.className = data.connected ? 'status-dot online' : 'status-dot';
 
-      const sel = getEl('pairSelect');
-      if (data.pairs && data.pairs.length > 0 && sel) {
-        const newHash = data.pairs.map(p => `${p.symbol}:${p.payout}`).join('|');
-        if (newHash !== window.lastPairsHash) {
-          window.lastPairsHash = newHash;
+      if (Array.isArray(data.pairs) && data.pairs.length > 0) {
+        const sel = getEl('pairSelect');
+        if (sel) {
           const currentVal = state.pair;
-          sel.innerHTML = data.pairs.map(p => {
-            let badge = '🔴';
-            if (p.payout >= 90) badge = '🔥';
-            else if (p.payout >= 85) badge = '🟢';
-            else if (p.payout >= 78) badge = '🟡';
-            return `<option value="${p.symbol}" ${p.symbol === currentVal ? 'selected' : ''}>${badge} ${p.symbol} — ${p.payout}%</option>`;
-          }).join('');
+          const sig = data.pairs.map(p => `${p.symbol}:${p.payout}`).join(',');
+          if (sel.dataset.sig !== sig) {
+            sel.dataset.sig = sig;
+            sel.innerHTML = data.pairs.map(p => {
+              let badge = '⚪';
+              if (p.payout >= 88) badge = '🔥';
+              else if (p.payout >= 78) badge = '🟡';
+              return `<option value="${p.symbol}" ${p.symbol === currentVal ? 'selected' : ''}>${badge} ${p.symbol} — ${p.payout}%</option>`;
+            }).join('');
+          }
         }
       }
-
 
       const card = getEl('signalCard');
       const icon = getEl('sigIcon');
@@ -548,7 +584,13 @@
       const sText = getEl('strengthText');
       const sFill = getEl('strengthFill');
 
-      card.className = 'signal-card';
+      if (card) card.className = 'signal-card';
+
+      const indSar = getEl('indSar');
+      if (indSar) {
+        indSar.textContent = an.sar ? an.sar : '—';
+        indSar.className = 'ind-val ' + (an.sar === 'BUY' ? 'bull' : (an.sar === 'SELL' ? 'bear' : ''));
+      }
 
       const rsiVal = an.rsi;
       const indRsi = getEl('indRsi');
@@ -557,29 +599,34 @@
         indRsi.className = 'ind-val ' + (rsiVal > 52 ? 'bull' : (rsiVal && rsiVal < 48 ? 'bear' : ''));
       }
 
+      const indEma = getEl('indEma');
+      const indKelt = getEl('indKelt');
+
       if (!data.connected) {
-        icon.textContent = '🔌';
-        title.textContent = 'CONNECTING...';
-        sub.textContent = 'З’єднання з сервером котирувань';
-        sText.textContent = 'offline';
-        sFill.style.width = '10%';
+        if (icon) icon.textContent = '🔌';
+        if (title) title.textContent = 'CONNECTING...';
+        if (sub) sub.textContent = 'З’єднання з сервером котирувань';
+        if (sText) sText.textContent = 'offline';
+        if (sFill) sFill.style.width = '0%';
       } else if (an.status === 'WARMING') {
-        const leftMins = Math.max(1, an.needed - an.collected);
-        const pctWarm = Math.round((an.collected / an.needed) * 100);
-        icon.textContent = '⏳';
-        title.textContent = `ЗБІР СВІЧОК ${an.collected}/${an.needed}`;
-        sub.textContent = `Залишилось чекати: ~${leftMins} хв (M1)`;
-        sText.textContent = `${pctWarm}%`;
-        sFill.style.width = `${pctWarm}%`;
+        if (icon) icon.textContent = '⏳';
+        if (title) title.textContent = `ЗБІР СВІЧОК ${an.collected}/${an.needed}`;
+        if (sub) sub.textContent = 'Формування історії ринку...';
+        if (sText) sText.textContent = 'warming';
+        if (sFill) sFill.style.width = `${Math.round((an.collected / an.needed) * 40)}%`;
+        if (indEma) { indEma.textContent = 'WAIT'; indEma.className = 'ind-val'; }
+        if (indKelt) { indKelt.textContent = 'WAIT'; indKelt.className = 'ind-val'; }
       } else if (an.status === 'WAIT_CANDLE') {
-        icon.textContent = '⏱';
-        title.textContent = `NEW BAR ${an.wait_sec}s`;
-        sub.textContent = 'Очікування відкриття нової свічки';
-        sText.textContent = 'pause';
-        sFill.style.width = '15%';
+        if (icon) icon.textContent = '⏱';
+        if (title) title.textContent = 'ПАУЗА СВІЧКИ';
+        if (sub) sub.textContent = `Чекаємо старт нової свічки (${an.wait_sec}с)`;
+        if (sText) sText.textContent = 'sync';
+        if (sFill) sFill.style.width = '30%';
+        if (indEma) { indEma.textContent = 'SYNC'; indEma.className = 'ind-val'; }
+        if (indKelt) { indKelt.textContent = 'OK'; indKelt.className = 'ind-val'; }
       } else if (an.status === 'SIGNAL') {
         const isCall = an.direction === 'CALL';
-        const targetExp = an.rec_exp || state.exp || '1m';
+        const targetExp = an.rec_exp || '1m';
         state.exp = targetExp;
 
         activeDoc.querySelectorAll('.exp-btn').forEach(b => {
@@ -587,78 +634,38 @@
           else b.classList.remove('active');
         });
 
-        card.classList.add(isCall ? 'call' : 'put');
-        icon.textContent = isCall ? '↗' : '↘';
-        title.textContent = isCall ? `BUY • ${targetExp}` : `SELL • ${targetExp}`;
-        sub.textContent = `Ціна: ${an.price} • Сек: :${String(an.sec).padStart(2, '0')}`;
+        if (card) card.classList.add(isCall ? 'call' : 'put');
+        if (icon) icon.textContent = isCall ? '↗' : '↘';
+        if (title) title.textContent = isCall ? `BUY • ${targetExp}` : `SELL • ${targetExp}`;
+        if (sub) sub.textContent = `Ціна: ${an.price} • Сек: :${String(an.sec).padStart(2, '0')}`;
 
-        const isMax = String(an.score || '').startsWith('10/10') || String(an.score || '').startsWith('9/10');
-        sText.textContent = isMax ? 'HIGH (STRONG)' : 'MEDIUM-HIGH';
-        sFill.style.width = isMax ? '96%' : '78%';
+        if (sText) sText.textContent = 'HIGH (STRONG)';
+        if (sFill) sFill.style.width = '94%';
 
-        getEl('indEma').textContent = isCall ? 'UP' : 'DOWN';
-        getEl('indEma').className = 'ind-val ' + (isCall ? 'bull' : 'bear');
-        getEl('indMacd').textContent = isCall ? 'ACTIVE+' : 'ACTIVE-';
-        getEl('indMacd').className = 'ind-val ' + (isCall ? 'bull' : 'bear');
-        getEl('indKelt').textContent = 'IN ZONE';
-        getEl('indKelt').className = 'ind-val ' + (isCall ? 'bull' : 'bear');
-        getEl('scoreBadge').textContent = an.score || '7/9';
+        if (indEma) { indEma.textContent = isCall ? 'BULL' : 'BEAR'; indEma.className = 'ind-val ' + (isCall ? 'bull' : 'bear'); }
+        if (indKelt) { indKelt.textContent = 'IN-CH'; indKelt.className = 'ind-val ' + (isCall ? 'bull' : 'bear'); }
 
         const sigKey = `${state.pair}_${an.direction}_${Math.floor(Date.now() / 15000)}`;
-        if (sigKey !== lastSignalKey) {
+        if (lastSignalKey !== sigKey) {
           lastSignalKey = sigKey;
-          playBeep(isCall);
+          playBeep(isCall ? 'call' : 'put');
         }
       } else {
-        icon.textContent = '📡';
-        title.textContent = 'ANALYZING...';
-        sub.textContent = `Ціна: ${an.price || '—'} • Сек: :${String(an.sec || 0).padStart(2, '0')}`;
-        sText.textContent = 'low (flat)';
-        sFill.style.width = '28%';
-
-        getEl('indEma').textContent = 'FLAT';
-        getEl('indEma').className = 'ind-val';
-        getEl('indMacd').textContent = 'WAIT';
-        getEl('indMacd').className = 'ind-val';
-        getEl('indKelt').textContent = 'NEUTRAL';
-        getEl('indKelt').className = 'ind-val';
-        getEl('scoreBadge').textContent = '9 filters';
+        if (icon) icon.textContent = '⚡';
+        if (title) title.textContent = 'ANALYZING...';
+        if (sub) sub.textContent = `Ціна: ${an.price || '—'} • Чекаємо чистий імпульс`;
+        if (sText) sText.textContent = 'scanning';
+        if (sFill) sFill.style.width = '35%';
+        if (indEma) { indEma.textContent = 'FLAT'; indEma.className = 'ind-val'; }
+        if (indKelt) { indKelt.textContent = 'OK'; indKelt.className = 'ind-val'; }
       }
-    } catch (err) {
-      if (getEl('sigTitle')) getEl('sigTitle').textContent = 'CONNECTION ERR';
+    } catch (e) {
+      const dot = getEl('connDot');
+      if (dot) dot.className = 'status-dot';
     }
   }
 
-  document.getElementById('pipBtn').addEventListener('click', async () => {
-    if ('documentPictureInPicture' in window) {
-      const pipWin = await window.documentPictureInPicture.requestWindow({ width: 330, height: 505 });
-      pipWin.document.head.appendChild(document.getElementById('appStyles').cloneNode(true));
-      const widget = document.getElementById('mainWidget');
-      document.getElementById('pipBtn').style.display = 'none';
-      if (state.apiUrl) document.getElementById('apiBar').style.display = 'none';
-      pipWin.document.body.appendChild(widget);
-      activeDoc = pipWin.document;
-
-      pipWin.addEventListener('pagehide', () => {
-        document.getElementById('pipBtn').style.display = 'block';
-        document.getElementById('apiBar').style.display = 'flex';
-        document.body.appendChild(widget);
-        activeDoc = document;
-        renderTracker();
-      });
-    } else {
-      const apiBar = document.getElementById('apiBar');
-      const pipBtn = document.getElementById('pipBtn');
-      if (state.apiUrl && apiBar.style.display !== 'none') {
-        apiBar.style.display = 'none';
-        pipBtn.textContent = '⚙️ URL';
-      } else {
-        apiBar.style.display = 'flex';
-        pipBtn.textContent = '📌 Поверх вікон';
-      }
-    }
-  });
-
+  bindEvents(document);
   render();
   pollServer();
   setInterval(pollServer, 1000);
