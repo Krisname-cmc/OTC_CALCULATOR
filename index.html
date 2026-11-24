@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SUPER AI PRO — Trading Terminal</title>
+  <title>SUPER AI PRO — M5 Trend Terminal</title>
   <style id="appStyles">
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
     body {
@@ -83,7 +83,7 @@
     }
     .exp-row {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 6px;
       margin-bottom: 10px;
     }
@@ -225,7 +225,7 @@
   <div class="header">
     <div class="brand">
       <span class="status-dot" id="connDot"></span>
-      <span>SUPER AI PRO</span>
+      <span>SUPER AI PRO • M5</span>
     </div>
     <div class="top-actions">
       <button class="icon-btn" id="btnPip">📌 Поверх вікон</button>
@@ -246,40 +246,39 @@
     <option value="BTCUSD_otc">₿ BTCUSD_otc</option>
   </select>
 
-  <div class="exp-label">Рекомендована експірація (AI Auto)</div>
+  <div class="exp-label">Рекомендована експірація (M5 Trend)</div>
   <div class="exp-row" id="expRow">
-    <button class="exp-btn" data-exp="30с">S30</button>
-    <button class="exp-btn active" data-exp="1m">M1</button>
-    <button class="exp-btn" data-exp="2m">M2</button>
-    <button class="exp-btn" data-exp="3m">M3</button>
+    <button class="exp-btn active" data-exp="5m">M5</button>
+    <button class="exp-btn" data-exp="10m">M10</button>
+    <button class="exp-btn" data-exp="15m">M15</button>
   </div>
 
   <div class="signal-card" id="signalCard">
     <div class="sig-icon" id="sigIcon">⚡</div>
     <div class="sig-title" id="sigTitle">SCANNING...</div>
-    <div class="sig-sub" id="sigSub">Очікування підключення до ринку</div>
+    <div class="sig-sub" id="sigSub">Очікування підключення до ринку M5</div>
     <div class="strength-head">
-      <span>Signal strength</span>
+      <span>Trend pullbacks</span>
       <span id="strengthText">waiting</span>
     </div>
     <div class="bar-bg"><div class="bar-fill" id="strengthFill"></div></div>
   </div>
 
   <div class="readings-title">
-    <span>Readings • Real quotes</span>
-    <span>4 core filters</span>
+    <span>Readings • M5 Candles</span>
+    <span>EMA 9/21/50 + Stoch</span>
   </div>
   <div class="readings-grid">
-    <div class="ind-chip"><span class="ind-name">SAR(0.02)</span><span class="ind-val" id="indSar">—</span></div>
-    <div class="ind-chip"><span class="ind-name">EMA 3/10</span><span class="ind-val" id="indEma">—</span></div>
-    <div class="ind-chip"><span class="ind-name">Keltner</span><span class="ind-val" id="indKelt">—</span></div>
-    <div class="ind-chip"><span class="ind-name">RSI(5)</span><span class="ind-val" id="indRsi">—</span></div>
+    <div class="ind-chip"><span class="ind-name">EMA Trend</span><span class="ind-val" id="indTrend">—</span></div>
+    <div class="ind-chip"><span class="ind-name">Stoch(14)</span><span class="ind-val" id="indStoch">—</span></div>
+    <div class="ind-chip"><span class="ind-name">RSI(14)</span><span class="ind-val" id="indRsi">—</span></div>
+    <div class="ind-chip"><span class="ind-name">Mode</span><span class="ind-val" id="indMode">M5</span></div>
   </div>
 
   <div class="stats-box">
     <div class="stats-top">
       <div>
-        <div style="font-size:10px;color:#64748b;">Winrate</div>
+        <div style="font-size:10px;color:#64748b;">Winrate (M5)</div>
         <div class="winrate" id="winRateVal">0.0%</div>
       </div>
       <div class="counts">
@@ -300,15 +299,15 @@
 </div>
 
 <script>
-  const DEFAULT_API = 'https://super-ai-trader-pro-production.up.railway.app';
-  const STORAGE_KEY = 'super_ai_pro_m1_clean';
+  const DEFAULT_API = 'https://railway.app';
+  const STORAGE_KEY = 'super_ai_pro_m5_trend';
   let activeDoc = document;
   let lastSignalKey = '';
 
   let state = {
     apiUrl: DEFAULT_API,
     pair: 'EURUSD_otc',
-    exp: '1m',
+    exp: '5m',
     sound: true,
     wins: 0,
     losses: 0,
@@ -470,21 +469,24 @@
 
       if (card) card.className = 'signal-card';
 
-      const indSar = getEl('indSar');
-      if (indSar) {
-        indSar.textContent = an.sar ? an.sar : '—';
-        indSar.className = 'ind-val ' + (an.sar === 'BUY' ? 'bull' : (an.sar === 'SELL' ? 'bear' : ''));
+      const indTrend = getEl('indTrend');
+      if (indTrend) {
+        indTrend.textContent = an.trend || '—';
+        indTrend.className = 'ind-val ' + (an.trend === 'UP-TREND' ? 'bull' : (an.trend === 'DOWN-TREND' ? 'bear' : ''));
+      }
+
+      const indStoch = getEl('indStoch');
+      if (indStoch) {
+        indStoch.textContent = an.stoch !== undefined ? `${an.stoch}` : '—';
+        indStoch.className = 'ind-val ' + (an.stoch > 60 ? 'bear' : (an.stoch !== undefined && an.stoch < 40 ? 'bull' : ''));
       }
 
       const rsiVal = an.rsi;
       const indRsi = getEl('indRsi');
       if (indRsi) {
-        indRsi.textContent = rsiVal ? `${rsiVal}` : '—';
-        indRsi.className = 'ind-val ' + (rsiVal > 52 ? 'bull' : (rsiVal && rsiVal < 48 ? 'bear' : ''));
+        indRsi.textContent = rsiVal !== undefined ? `${rsiVal}` : '—';
+        indRsi.className = 'ind-val ' + (rsiVal > 52 ? 'bull' : (rsiVal !== undefined && rsiVal < 48 ? 'bear' : ''));
       }
-
-      const indEma = getEl('indEma');
-      const indKelt = getEl('indKelt');
 
       if (!data.connected) {
         if (icon) icon.textContent = '🔌';
@@ -494,23 +496,19 @@
         if (sFill) sFill.style.width = '0%';
       } else if (an.status === 'WARMING') {
         if (icon) icon.textContent = '⏳';
-        if (title) title.textContent = `ЗБІР СВІЧОК ${an.collected}/${an.needed}`;
-        if (sub) sub.textContent = 'Формування історії ринку...';
+        if (title) title.textContent = `ЗБІР СВІЧОК M5 ${an.collected}/${an.needed}`;
+        if (sub) sub.textContent = 'Завантаження 5-хвилинної історії...';
         if (sText) sText.textContent = 'warming';
         if (sFill) sFill.style.width = `${Math.round((an.collected / an.needed) * 40)}%`;
-        if (indEma) { indEma.textContent = 'WAIT'; indEma.className = 'ind-val'; }
-        if (indKelt) { indKelt.textContent = 'WAIT'; indKelt.className = 'ind-val'; }
       } else if (an.status === 'WAIT_CANDLE') {
         if (icon) icon.textContent = '⏱';
-        if (title) title.textContent = 'ПАУЗА СВІЧКИ';
-        if (sub) sub.textContent = `Чекаємо старт нової свічки (${an.wait_sec}с)`;
+        if (title) title.textContent = 'ПАУЗА СВІЧКИ M5';
+        if (sub) sub.textContent = `Нова 5-хв свічка через ${an.wait_sec}с`;
         if (sText) sText.textContent = 'sync';
         if (sFill) sFill.style.width = '30%';
-        if (indEma) { indEma.textContent = 'SYNC'; indEma.className = 'ind-val'; }
-        if (indKelt) { indKelt.textContent = 'OK'; indKelt.className = 'ind-val'; }
       } else if (an.status === 'SIGNAL') {
         const isCall = an.direction === 'CALL';
-        const targetExp = an.rec_exp || '1m';
+        const targetExp = an.rec_exp || '5m';
         state.exp = targetExp;
 
         activeDoc.querySelectorAll('.exp-btn').forEach(b => {
@@ -521,27 +519,22 @@
         if (card) card.classList.add(isCall ? 'call' : 'put');
         if (icon) icon.textContent = isCall ? '↗' : '↘';
         if (title) title.textContent = isCall ? `BUY • ${targetExp}` : `SELL • ${targetExp}`;
-        if (sub) sub.textContent = `Ціна: ${an.price} • Сек: :${String(an.sec).padStart(2, '0')}`;
+        if (sub) sub.textContent = `Відкат по тренду • Ціна: ${an.price}`;
 
-        if (sText) sText.textContent = 'HIGH (STRONG)';
-        if (sFill) sFill.style.width = '94%';
+        if (sText) sText.textContent = 'HIGH (M5 TREND)';
+        if (sFill) sFill.style.width = '95%';
 
-        if (indEma) { indEma.textContent = isCall ? 'BULL' : 'BEAR'; indEma.className = 'ind-val ' + (isCall ? 'bull' : 'bear'); }
-        if (indKelt) { indKelt.textContent = 'IN-CH'; indKelt.className = 'ind-val ' + (isCall ? 'bull' : 'bear'); }
-
-        const sigKey = `${state.pair}_${an.direction}_${Math.floor(Date.now() / 15000)}`;
+        const sigKey = `${state.pair}_${an.direction}_${Math.floor(Date.now() / 60000)}`;
         if (lastSignalKey !== sigKey) {
           lastSignalKey = sigKey;
           playBeep(isCall ? 'call' : 'put');
         }
       } else {
         if (icon) icon.textContent = '⚡';
-        if (title) title.textContent = 'ANALYZING...';
-        if (sub) sub.textContent = `Ціна: ${an.price || '—'} • Чекаємо чистий імпульс`;
+        if (title) title.textContent = 'ANALYZING M5...';
+        if (sub) sub.textContent = `Ціна: ${an.price || '—'} • Чекаємо відкат по тренду`;
         if (sText) sText.textContent = 'scanning';
         if (sFill) sFill.style.width = '35%';
-        if (indEma) { indEma.textContent = 'FLAT'; indEma.className = 'ind-val'; }
-        if (indKelt) { indKelt.textContent = 'OK'; indKelt.className = 'ind-val'; }
       }
     } catch (e) {
       const dot = getEl('connDot');
