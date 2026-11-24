@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SUPER AI PRO — M5 Trend Terminal</title>
+  <title>SUPER AI PRO — 92% Radar M5</title>
   <style id="appStyles">
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
     body {
@@ -11,18 +11,18 @@
       color: #f8fafc;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       min-height: 100vh;
-      padding: 10px;
+      padding: 8px;
     }
     .widget {
       width: 100%;
-      max-width: 340px;
+      max-width: 360px;
       background: #111827;
       border: 1px solid #1f2937;
       border-radius: 16px;
-      padding: 14px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+      padding: 12px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.65);
     }
     .header {
       display: flex;
@@ -36,7 +36,6 @@
       gap: 7px;
       font-weight: 800;
       font-size: 13px;
-      letter-spacing: 0.5px;
       color: #e2e8f0;
     }
     .status-dot {
@@ -51,7 +50,7 @@
       background: #10b981;
       box-shadow: 0 0 10px #10b981;
     }
-    .top-actions { display: flex; gap: 6px; }
+    .top-actions { display: flex; gap: 5px; }
     .icon-btn {
       background: #1e293b;
       border: 1px solid #334155;
@@ -62,138 +61,96 @@
       cursor: pointer;
     }
     .icon-btn:hover { background: #334155; }
-    select {
-      width: 100%;
-      background: #0f172a;
-      color: #f8fafc;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 9px 10px;
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 10px;
-      outline: none;
-    }
-    .exp-label {
-      font-size: 10px;
-      color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 5px;
-    }
-    .exp-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-    .exp-btn {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      color: #94a3b8;
-      padding: 6px 0;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .exp-btn.active {
-      background: #2563eb;
-      border-color: #3b82f6;
-      color: #ffffff;
-    }
-    .signal-card {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 14px;
-      padding: 14px 12px;
-      text-align: center;
-      margin-bottom: 10px;
-      transition: 0.25s;
-    }
-    .signal-card.call {
-      background: rgba(16, 185, 129, 0.14);
-      border-color: #10b981;
-    }
-    .signal-card.put {
-      background: rgba(239, 68, 68, 0.14);
-      border-color: #ef4444;
-    }
-    .sig-icon { font-size: 26px; margin-bottom: 4px; }
-    .sig-title { font-size: 19px; font-weight: 900; letter-spacing: 0.5px; margin-bottom: 3px; }
-    .signal-card.call .sig-title { color: #34d399; }
-    .signal-card.put .sig-title { color: #f87171; }
-    .sig-sub { font-size: 11px; color: #94a3b8; margin-bottom: 10px; }
-    .strength-head {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: #64748b;
-      margin-bottom: 4px;
-    }
-    .bar-bg {
-      width: 100%;
-      height: 5px;
-      background: #1e293b;
-      border-radius: 99px;
-      overflow: hidden;
-    }
-    .bar-fill {
-      height: 100%;
-      width: 20%;
-      background: #3b82f6;
-      transition: width 0.3s;
-    }
-    .signal-card.call .bar-fill { background: #10b981; }
-    .signal-card.put .bar-fill { background: #ef4444; }
-    .readings-title {
-      font-size: 10px;
-      color: #64748b;
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .readings-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-    .ind-chip {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      padding: 6px 8px;
+    .radar-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 11px;
+      font-size: 10px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      padding: 0 2px;
     }
-    .ind-name { color: #94a3b8; }
-    .ind-val { font-weight: 800; color: #e2e8f0; }
-    .ind-val.bull { color: #34d399; }
-    .ind-val.bear { color: #f87171; }
+    .rows-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 310px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      padding-right: 2px;
+    }
+    .rows-container::-webkit-scrollbar { width: 4px; }
+    .rows-container::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+    .pair-row {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: 0.25s;
+    }
+    .pair-row.buy {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: #10b981;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+    }
+    .pair-row.sell {
+      background: rgba(239, 68, 68, 0.22);
+      border-color: #ef4444;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+    }
+    .pair-left { display: flex; flex-direction: column; gap: 2px; }
+    .pair-name { font-size: 13px; font-weight: 800; color: #f8fafc; display: flex; align-items: center; gap: 5px; }
+    .payout-tag {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 5px;
+    }
+    .pair-meta { font-size: 10px; color: #94a3b8; }
+
+    .pair-right { text-align: right; }
+    .badge-action {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.3px;
+    }
+    .badge-buy { background: #10b981; color: #042f1e; }
+    .badge-sell { background: #ef4444; color: #ffffff; }
+    .badge-scan { background: #1e293b; color: #94a3b8; font-weight: 700; font-size: 11px; }
+    .badge-warm { background: #1e293b; color: #60a5fa; font-weight: 700; font-size: 11px; }
+
     .stats-box {
       background: #0f172a;
       border: 1px solid #1e293b;
       border-radius: 12px;
-      padding: 10px;
+      padding: 9px 10px;
     }
     .stats-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 7px;
     }
     .winrate { font-size: 18px; font-weight: 900; color: #38bdf8; }
-    .counts { font-size: 11px; color: #94a3b8; }
+    .counts { font-size: 11px; color: #94a3b8; display: flex; gap: 8px; }
     .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
     .btn-win {
       background: #10b981;
       color: #052e16;
       border: none;
       border-radius: 8px;
-      padding: 8px;
+      padding: 7px;
       font-weight: 900;
       font-size: 14px;
       cursor: pointer;
@@ -203,7 +160,7 @@
       color: #450a0a;
       border: none;
       border-radius: 8px;
-      padding: 8px;
+      padding: 7px;
       font-weight: 900;
       font-size: 14px;
       cursor: pointer;
@@ -225,7 +182,7 @@
   <div class="header">
     <div class="brand">
       <span class="status-dot" id="connDot"></span>
-      <span>SUPER AI PRO • M5</span>
+      <span>RADAR 92% • M5</span>
     </div>
     <div class="top-actions">
       <button class="icon-btn" id="btnPip">📌 Поверх вікон</button>
@@ -233,46 +190,19 @@
     </div>
   </div>
 
-  <select id="pairSelect">
-    <option value="EURUSD_otc">💎 EURUSD_otc</option>
-    <option value="GBPUSD_otc">💎 GBPUSD_otc</option>
-    <option value="USDJPY_otc">💎 USDJPY_otc</option>
-    <option value="AUDUSD_otc">💎 AUDUSD_otc</option>
-    <option value="USDCAD_otc">💎 USDCAD_otc</option>
-    <option value="USDCHF_otc">💎 USDCHF_otc</option>
-    <option value="AUDCAD_otc">💎 AUDCAD_otc</option>
-    <option value="AUDNZD_otc">💎 AUDNZD_otc</option>
-    <option value="XAUUSD_otc">🥇 XAUUSD_otc</option>
-    <option value="BTCUSD_otc">₿ BTCUSD_otc</option>
-  </select>
-
-  <div class="exp-label">Рекомендована експірація (M5 Trend)</div>
-  <div class="exp-row" id="expRow">
-    <button class="exp-btn active" data-exp="5m">M5</button>
-    <button class="exp-btn" data-exp="10m">M10</button>
-    <button class="exp-btn" data-exp="15m">M15</button>
+  <div class="radar-head">
+    <span>Активні пари (виплата 92%+)</span>
+    <span id="pairCount">0 пар</span>
   </div>
 
-  <div class="signal-card" id="signalCard">
-    <div class="sig-icon" id="sigIcon">⚡</div>
-    <div class="sig-title" id="sigTitle">SCANNING...</div>
-    <div class="sig-sub" id="sigSub">Очікування підключення до ринку M5</div>
-    <div class="strength-head">
-      <span>Trend pullbacks</span>
-      <span id="strengthText">waiting</span>
+  <div class="rows-container" id="rowsContainer">
+    <div class="pair-row">
+      <div class="pair-left">
+        <div class="pair-name">Підключення до ринку...</div>
+        <div class="pair-meta">Пошук пар із виплатою 92%</div>
+      </div>
+      <div class="pair-right"><span class="badge-action badge-scan">WAIT</span></div>
     </div>
-    <div class="bar-bg"><div class="bar-fill" id="strengthFill"></div></div>
-  </div>
-
-  <div class="readings-title">
-    <span>Readings • M5 Candles</span>
-    <span>EMA 9/21/50 + Stoch</span>
-  </div>
-  <div class="readings-grid">
-    <div class="ind-chip"><span class="ind-name">EMA Trend</span><span class="ind-val" id="indTrend">—</span></div>
-    <div class="ind-chip"><span class="ind-name">Stoch(14)</span><span class="ind-val" id="indStoch">—</span></div>
-    <div class="ind-chip"><span class="ind-name">RSI(14)</span><span class="ind-val" id="indRsi">—</span></div>
-    <div class="ind-chip"><span class="ind-name">Mode</span><span class="ind-val" id="indMode">M5</span></div>
   </div>
 
   <div class="stats-box">
@@ -282,9 +212,9 @@
         <div class="winrate" id="winRateVal">0.0%</div>
       </div>
       <div class="counts">
-        <div>Плюс (+): <b id="countWin" style="color:#34d399;">0</b></div>
-        <div>Мінус (−): <b id="countLoss" style="color:#f87171;">0</b></div>
-        <div>Усього: <b id="countTotal">0</b></div>
+        <span>+: <b id="countWin" style="color:#34d399;">0</b></span>
+        <span>−: <b id="countLoss" style="color:#f87171;">0</b></span>
+        <span>Всього: <b id="countTotal">0</b></span>
       </div>
     </div>
     <div class="btn-row">
@@ -297,17 +227,14 @@
     </div>
   </div>
 </div>
-
 <script>
-  const DEFAULT_API = 'https://super-ai-trader-pro-production.up.railway.app';
-  const STORAGE_KEY = 'super_ai_pro_m5_trend';
+  const DEFAULT_API = 'https://railway.app';
+  const STORAGE_KEY = 'super_ai_radar_92_m5';
   let activeDoc = document;
-  let lastSignalKey = '';
+  let alertedSignals = new Set();
 
   let state = {
     apiUrl: DEFAULT_API,
-    pair: 'EURUSD_otc',
-    exp: '5m',
     sound: true,
     wins: 0,
     losses: 0,
@@ -337,15 +264,15 @@
       const gain = ctx.createGain();
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.frequency.value = type === 'call' ? 880 : 440;
-      gain.gain.setValueAtTime(0.08, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+      osc.frequency.value = type === 'BUY' ? 880 : 440;
+      gain.gain.setValueAtTime(0.09, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
       osc.start();
-      osc.stop(ctx.currentTime + 0.18);
+      osc.stop(ctx.currentTime + 0.2);
     } catch (e) {}
   }
 
-  function render() {
+  function renderStats() {
     const total = state.wins + state.losses;
     const rate = total > 0 ? ((state.wins / total) * 100).toFixed(1) : '0.0';
     const wEl = getEl('winRateVal');
@@ -359,32 +286,11 @@
   }
 
   function bindEvents(doc) {
-    const pairSel = doc.getElementById('pairSelect');
-    if (pairSel) {
-      pairSel.value = state.pair;
-      pairSel.onchange = (e) => {
-        state.pair = e.target.value;
-        saveState();
-        pollServer();
-      };
-    }
-
-    doc.querySelectorAll('.exp-btn').forEach(btn => {
-      if (btn.dataset.exp === state.exp) btn.classList.add('active');
-      else btn.classList.remove('active');
-      btn.onclick = () => {
-        doc.querySelectorAll('.exp-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.exp = btn.dataset.exp;
-        saveState();
-      };
-    });
-
     const btnWin = doc.getElementById('btnWin');
-    if (btnWin) btnWin.onclick = () => { state.wins++; state.history.push('W'); saveState(); render(); };
+    if (btnWin) btnWin.onclick = () => { state.wins++; state.history.push('W'); saveState(); renderStats(); };
 
     const btnLoss = doc.getElementById('btnLoss');
-    if (btnLoss) btnLoss.onclick = () => { state.losses++; state.history.push('L'); saveState(); render(); };
+    if (btnLoss) btnLoss.onclick = () => { state.losses++; state.history.push('L'); saveState(); renderStats(); };
 
     const btnUndo = doc.getElementById('btnUndo');
     if (btnUndo) btnUndo.onclick = () => {
@@ -392,14 +298,14 @@
       if (last === 'W' && state.wins > 0) state.wins--;
       if (last === 'L' && state.losses > 0) state.losses--;
       saveState();
-      render();
+      renderStats();
     };
 
     const btnReset = doc.getElementById('btnReset');
     if (btnReset) btnReset.onclick = () => {
       state.wins = 0; state.losses = 0; state.history = [];
       saveState();
-      render();
+      renderStats();
     };
 
     const btnSound = doc.getElementById('btnSound');
@@ -416,7 +322,7 @@
     if (btnPip && 'documentPictureInPicture' in window) {
       btnPip.onclick = async () => {
         try {
-          const pipWin = await window.documentPictureInPicture.requestWindow({ width: 340, height: 590 });
+          const pipWin = await window.documentPictureInPicture.requestWindow({ width: 360, height: 540 });
           const style = document.getElementById('appStyles');
           if (style) pipWin.document.head.appendChild(style.cloneNode(true));
           const widget = document.getElementById('appWidget');
@@ -434,107 +340,69 @@
   }
 
   async function pollServer() {
-    if (!state.apiUrl) return;
     try {
-      const res = await fetch(`${state.apiUrl}/api/status?symbol=${encodeURIComponent(state.pair)}`);
+      const res = await fetch(`${state.apiUrl}/api/status`);
       const data = await res.json();
-      const an = data.analysis || {};
 
       const dot = getEl('connDot');
       if (dot) dot.className = data.connected ? 'status-dot online' : 'status-dot';
 
-      if (Array.isArray(data.pairs) && data.pairs.length > 0) {
-        const sel = getEl('pairSelect');
-        if (sel) {
-          const currentVal = state.pair;
-          const sig = data.pairs.map(p => `${p.symbol}:${p.payout}`).join(',');
-          if (sel.dataset.sig !== sig) {
-            sel.dataset.sig = sig;
-            sel.innerHTML = data.pairs.map(p => {
-              let badge = '⚪';
-              if (p.payout >= 88) badge = '🔥';
-              else if (p.payout >= 78) badge = '🟡';
-              return `<option value="${p.symbol}" ${p.symbol === currentVal ? 'selected' : ''}>${badge} ${p.symbol} — ${p.payout}%</option>`;
-            }).join('');
-          }
-        }
-      }
+      const rows = Array.isArray(data.rows) ? data.rows : [];
+      const countEl = getEl('pairCount');
+      if (countEl) countEl.textContent = `${rows.length} пар (92%)`;
 
-      const card = getEl('signalCard');
-      const icon = getEl('sigIcon');
-      const title = getEl('sigTitle');
-      const sub = getEl('sigSub');
-      const sText = getEl('strengthText');
-      const sFill = getEl('strengthFill');
-
-      if (card) card.className = 'signal-card';
-
-      const indTrend = getEl('indTrend');
-      if (indTrend) {
-        indTrend.textContent = an.trend || '—';
-        indTrend.className = 'ind-val ' + (an.trend === 'UP-TREND' ? 'bull' : (an.trend === 'DOWN-TREND' ? 'bear' : ''));
-      }
-
-      const indStoch = getEl('indStoch');
-      if (indStoch) {
-        indStoch.textContent = an.stoch !== undefined ? `${an.stoch}` : '—';
-        indStoch.className = 'ind-val ' + (an.stoch > 60 ? 'bear' : (an.stoch !== undefined && an.stoch < 40 ? 'bull' : ''));
-      }
-
-      const rsiVal = an.rsi;
-      const indRsi = getEl('indRsi');
-      if (indRsi) {
-        indRsi.textContent = rsiVal !== undefined ? `${rsiVal}` : '—';
-        indRsi.className = 'ind-val ' + (rsiVal > 52 ? 'bull' : (rsiVal !== undefined && rsiVal < 48 ? 'bear' : ''));
-      }
+      const box = getEl('rowsContainer');
+      if (!box) return;
 
       if (!data.connected) {
-        if (icon) icon.textContent = '🔌';
-        if (title) title.textContent = 'CONNECTING...';
-        if (sub) sub.textContent = 'З’єднання з сервером котирувань';
-        if (sText) sText.textContent = 'offline';
-        if (sFill) sFill.style.width = '0%';
-      } else if (an.status === 'WARMING') {
-        if (icon) icon.textContent = '⏳';
-        if (title) title.textContent = `ЗБІР СВІЧОК M5 ${an.collected}/${an.needed}`;
-        if (sub) sub.textContent = 'Завантаження 5-хвилинної історії...';
-        if (sText) sText.textContent = 'warming';
-        if (sFill) sFill.style.width = `${Math.round((an.collected / an.needed) * 40)}%`;
-      } else if (an.status === 'WAIT_CANDLE') {
-        if (icon) icon.textContent = '⏱';
-        if (title) title.textContent = 'ПАУЗА СВІЧКИ M5';
-        if (sub) sub.textContent = `Нова 5-хв свічка через ${an.wait_sec}с`;
-        if (sText) sText.textContent = 'sync';
-        if (sFill) sFill.style.width = '30%';
-      } else if (an.status === 'SIGNAL') {
-        const isCall = an.direction === 'CALL';
-        const targetExp = an.rec_exp || '5m';
-        state.exp = targetExp;
+        box.innerHTML = `<div class="pair-row"><div class="pair-left"><div class="pair-name">З’єднання з сервером...</div><div class="pair-meta">Очікування підключення</div></div><div class="pair-right"><span class="badge-action badge-scan">OFFLINE</span></div></div>`;
+        return;
+      }
 
-        activeDoc.querySelectorAll('.exp-btn').forEach(b => {
-          if (b.dataset.exp === targetExp) b.classList.add('active');
-          else b.classList.remove('active');
-        });
+      if (rows.length === 0) {
+        box.innerHTML = `<div class="pair-row"><div class="pair-left"><div class="pair-name">Немає пар із 92%</div><div class="pair-meta">Чекаємо підвищення відсотка</div></div><div class="pair-right"><span class="badge-action badge-scan">0 ПАР</span></div></div>`;
+        return;
+      }
 
-        if (card) card.classList.add(isCall ? 'call' : 'put');
-        if (icon) icon.textContent = isCall ? '↗' : '↘';
-        if (title) title.textContent = isCall ? `BUY • ${targetExp}` : `SELL • ${targetExp}`;
-        if (sub) sub.textContent = `Відкат по тренду • Ціна: ${an.price}`;
+      const minuteBucket = Math.floor(Date.now() / 60000);
+      let hasNewSignal = null;
 
-        if (sText) sText.textContent = 'HIGH (M5 TREND)';
-        if (sFill) sFill.style.width = '95%';
+      box.innerHTML = rows.map(r => {
+        let rowClass = 'pair-row';
+        let badgeHtml = `<span class="badge-action badge-scan">SCAN</span>`;
+        let metaText = `Trend: ${r.trend || '—'} • RSI: ${r.rsi ?? '—'} • Stoch: ${r.stoch ?? '—'}`;
 
-        const sigKey = `${state.pair}_${an.direction}_${Math.floor(Date.now() / 60000)}`;
-        if (lastSignalKey !== sigKey) {
-          lastSignalKey = sigKey;
-          playBeep(isCall ? 'call' : 'put');
+        if (r.status === 'SIGNAL') {
+          const isBuy = r.direction === 'BUY';
+          rowClass += isBuy ? ' buy' : ' sell';
+          badgeHtml = `<span class="badge-action ${isBuy ? 'badge-buy' : 'badge-sell'}">${isBuy ? '↗ BUY' : '↘ SELL'} • ${r.rec_exp}</span>`;
+          metaText = `Ціна: ${r.price} • RSI: ${r.rsi} • Stoch: ${r.stoch}`;
+
+          const key = `${r.symbol}_${r.direction}_${minuteBucket}`;
+          if (!alertedSignals.has(key)) {
+            alertedSignals.add(key);
+            hasNewSignal = r.direction;
+          }
+        } else if (r.status === 'WARMING') {
+          badgeHtml = `<span class="badge-action badge-warm">⏳ ${r.collected}/${r.needed}</span>`;
+          metaText = `Збір свічок M5...`;
+        } else if (r.status === 'WAIT') {
+          badgeHtml = `<span class="badge-action badge-scan">ПАУЗА</span>`;
         }
-      } else {
-        if (icon) icon.textContent = '⚡';
-        if (title) title.textContent = 'ANALYZING M5...';
-        if (sub) sub.textContent = `Ціна: ${an.price || '—'} • Чекаємо відкат по тренду`;
-        if (sText) sText.textContent = 'scanning';
-        if (sFill) sFill.style.width = '35%';
+
+        return `
+          <div class="${rowClass}">
+            <div class="pair-left">
+              <div class="pair-name">🔥 ${r.symbol} <span class="payout-tag">${r.payout}%</span></div>
+              <div class="pair-meta">${metaText}</div>
+            </div>
+            <div class="pair-right">${badgeHtml}</div>
+          </div>
+        `;
+      }).join('');
+
+      if (hasNewSignal) {
+        playBeep(hasNewSignal);
       }
     } catch (e) {
       const dot = getEl('connDot');
@@ -543,7 +411,7 @@
   }
 
   bindEvents(document);
-  render();
+  renderStats();
   pollServer();
   setInterval(pollServer, 1000);
 </script>
