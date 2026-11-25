@@ -263,7 +263,7 @@
       const ctx = new AudioCtx();
       if (ctx.state === 'suspended') ctx.resume();
 
-      const notes = type === 'BUY' ? [660, 880, 1175] :;
+      const notes = type === 'BUY' ? [523.25, 659.25, 783.99] : [783.99, 659.25, 523.25];
       notes.forEach((freq, idx) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
