@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SUPER AI PRO — 92% Radar M5</title>
+  <title>SUPER AI PRO — 92% Radar M1</title>
   <style id="appStyles">
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
     body {
@@ -17,7 +17,7 @@
     }
     .widget {
       width: 100%;
-      max-width: 360px;
+      max-width: 365px;
       background: #111827;
       border: 1px solid #1f2937;
       border-radius: 16px;
@@ -76,7 +76,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      max-height: 310px;
+      max-height: 325px;
       overflow-y: auto;
       margin-bottom: 10px;
       padding-right: 2px;
@@ -94,17 +94,7 @@
       align-items: center;
       transition: 0.25s;
     }
-    .pair-row.buy {
-      background: rgba(16, 185, 129, 0.22);
-      border-color: #10b981;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
-    }
-    .pair-row.sell {
-      background: rgba(239, 68, 68, 0.22);
-      border-color: #ef4444;
-      box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
-    }
-    .pair-left { display: flex; flex-direction: column; gap: 2px; }
+    .pair-left { display: flex; flex-direction: column; gap: 3px; }
     .pair-name { font-size: 13px; font-weight: 800; color: #f8fafc; display: flex; align-items: center; gap: 5px; }
     .payout-tag {
       background: rgba(245, 158, 11, 0.18);
@@ -114,12 +104,20 @@
       padding: 1px 5px;
       border-radius: 5px;
     }
+    .new-tag {
+      background: #38bdf8;
+      color: #082f49;
+      font-size: 9px;
+      font-weight: 900;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
     .pair-meta { font-size: 10px; color: #94a3b8; }
 
-    .pair-right { text-align: right; }
+    .pair-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
     .badge-action {
       display: inline-block;
-      padding: 4px 8px;
+      padding: 4px 9px;
       border-radius: 7px;
       font-size: 12px;
       font-weight: 900;
@@ -182,7 +180,7 @@
   <div class="header">
     <div class="brand">
       <span class="status-dot" id="connDot"></span>
-      <span>RADAR 92% • M5</span>
+      <span>RADAR 92% • M1</span>
     </div>
     <div class="top-actions">
       <button class="icon-btn" id="btnPip">📌 Поверх вікон</button>
@@ -191,7 +189,7 @@
   </div>
 
   <div class="radar-head">
-    <span>Активні пари (виплата 92%+)</span>
+    <span>Пари 92% • Таймфрейм M1</span>
     <span id="pairCount">0 пар</span>
   </div>
 
@@ -199,7 +197,7 @@
     <div class="pair-row">
       <div class="pair-left">
         <div class="pair-name">Підключення до ринку...</div>
-        <div class="pair-meta">Пошук пар із виплатою 92%</div>
+        <div class="pair-meta">Завантаження котирувань M1</div>
       </div>
       <div class="pair-right"><span class="badge-action badge-scan">WAIT</span></div>
     </div>
@@ -208,7 +206,7 @@
   <div class="stats-box">
     <div class="stats-top">
       <div>
-        <div style="font-size:10px;color:#64748b;">Winrate (M5)</div>
+        <div style="font-size:10px;color:#64748b;">Winrate (M1)</div>
         <div class="winrate" id="winRateVal">0.0%</div>
       </div>
       <div class="counts">
@@ -228,8 +226,8 @@
   </div>
 </div>
 <script>
-  const DEFAULT_API = 'https://super-ai-trader-pro-production.up.railway.app';
-  const STORAGE_KEY = 'super_ai_radar_92_m5';
+  const DEFAULT_API = 'https://railway.app';
+  const STORAGE_KEY = 'super_ai_radar_92_m1';
   let activeDoc = document;
   let alertedSignals = new Set();
 
@@ -325,6 +323,7 @@
         state.sound = !state.sound;
         btnSound.textContent = state.sound ? '🔊' : '🔇';
         saveState();
+        if (state.sound) playBeep('BUY');
       };
     }
 
@@ -332,7 +331,7 @@
     if (btnPip && 'documentPictureInPicture' in window) {
       btnPip.onclick = async () => {
         try {
-          const pipWin = await window.documentPictureInPicture.requestWindow({ width: 360, height: 540 });
+          const pipWin = await window.documentPictureInPicture.requestWindow({ width: 365, height: 550 });
           const style = document.getElementById('appStyles');
           if (style) pipWin.document.head.appendChild(style.cloneNode(true));
           const widget = document.getElementById('appWidget');
@@ -365,7 +364,7 @@
       if (!box) return;
 
       if (!data.connected) {
-        box.innerHTML = `<div class="pair-row"><div class="pair-left"><div class="pair-name">З’єднання з сервером...</div><div class="pair-meta">Очікування підключення</div></div><div class="pair-right"><span class="badge-action badge-scan">OFFLINE</span></div></div>`;
+        box.innerHTML = `<div class="pair-row"><div class="pair-left"><div class="pair-name">З’єднання з сервером...</div><div class="pair-meta">Очікування підключення M1</div></div><div class="pair-right"><span class="badge-action badge-scan">OFFLINE</span></div></div>`;
         return;
       }
 
@@ -374,13 +373,12 @@
         return;
       }
 
-      const minuteBucket = Math.floor(Date.now() / 60000);
       let hasNewSignal = null;
 
       box.innerHTML = rows.map(r => {
         let badgeHtml = `<span class="badge-action badge-scan">SCAN</span>`;
         let newBadge = '';
-        let metaText = `CCI: ${r.cci ?? '—'} • RSI: ${r.rsi ?? '—'}`;
+        let metaText = `Stoch: ${r.cci ?? '—'} • RSI: ${r.rsi ?? '—'}`;
 
         const ls = r.last_signal;
         if (ls && ls.direction) {
@@ -392,7 +390,6 @@
             <span class="badge-action ${isBuy ? 'badge-buy' : 'badge-sell'}">${ls.rec_exp}</span>
             <span style="font-size:10px;color:#cbd5e1;font-weight:700;">🕒 ${ls.time}</span>
           `;
-          metaText = `CCI: ${r.cci ?? '—'} • RSI: ${r.rsi ?? '—'}`;
 
           const key = `${r.symbol}_${ls.direction}_${ls.bucket}`;
           if (r.is_fresh && !alertedSignals.has(key)) {
@@ -401,7 +398,7 @@
           }
         } else if (r.status === 'WARMING') {
           badgeHtml = `<span class="badge-action badge-warm">⏳ ${r.collected}/${r.needed}</span>`;
-          metaText = `Збір свічок M5...`;
+          metaText = `Збір свічок M1...`;
         }
 
         return `
