@@ -368,32 +368,36 @@
       let hasNewSignal = null;
 
       box.innerHTML = rows.map(r => {
-        let rowClass = 'pair-row';
         let badgeHtml = `<span class="badge-action badge-scan">SCAN</span>`;
-        let metaText = `Trend: ${r.trend || '—'} • RSI: ${r.rsi ?? '—'} • Stoch: ${r.stoch ?? '—'}`;
+        let newBadge = '';
+        let metaText = `CCI: ${r.cci ?? '—'} • RSI: ${r.rsi ?? '—'}`;
 
-        if (r.status === 'SIGNAL') {
-          const isBuy = r.direction === 'BUY';
-          rowClass += isBuy ? ' buy' : ' sell';
-          badgeHtml = `<span class="badge-action ${isBuy ? 'badge-buy' : 'badge-sell'}">${isBuy ? '↗ BUY' : '↘ SELL'} • ${r.rec_exp}</span>`;
-          metaText = `Ціна: ${r.price} • RSI: ${r.rsi} • Stoch: ${r.stoch}`;
+        const ls = r.last_signal;
+        if (ls && ls.direction) {
+          const isBuy = ls.direction === 'BUY';
+          if (r.is_fresh) {
+            newBadge = `<span class="new-tag">NEW</span>`;
+          }
+          badgeHtml = `
+            <span class="badge-action ${isBuy ? 'badge-buy' : 'badge-sell'}">${ls.rec_exp}</span>
+            <span style="font-size:10px;color:#cbd5e1;font-weight:700;">🕒 ${ls.time}</span>
+          `;
+          metaText = `CCI: ${r.cci ?? '—'} • RSI: ${r.rsi ?? '—'}`;
 
-          const key = `${r.symbol}_${r.direction}_${minuteBucket}`;
-          if (!alertedSignals.has(key)) {
+          const key = `${r.symbol}_${ls.direction}_${ls.bucket}`;
+          if (r.is_fresh && !alertedSignals.has(key)) {
             alertedSignals.add(key);
-            hasNewSignal = r.direction;
+            hasNewSignal = ls.direction;
           }
         } else if (r.status === 'WARMING') {
           badgeHtml = `<span class="badge-action badge-warm">⏳ ${r.collected}/${r.needed}</span>`;
           metaText = `Збір свічок M5...`;
-        } else if (r.status === 'WAIT') {
-          badgeHtml = `<span class="badge-action badge-scan">ПАУЗА</span>`;
         }
 
         return `
-          <div class="${rowClass}">
+          <div class="pair-row">
             <div class="pair-left">
-              <div class="pair-name">🔥 ${r.symbol} <span class="payout-tag">${r.payout}%</span></div>
+              <div class="pair-name">🔥 ${r.symbol} <span class="payout-tag">${r.payout}%</span> ${newBadge}</div>
               <div class="pair-meta">${metaText}</div>
             </div>
             <div class="pair-right">${badgeHtml}</div>
